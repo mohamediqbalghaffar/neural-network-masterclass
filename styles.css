@@ -88,6 +88,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
@@ -1607,4 +1608,42 @@ html[dir="rtl"] .lang-toggle {
         right: auto;
         left: 1rem;
     }
+}
+
+/* ── Mobile Touch Enhancements ─────────────────────────────── */
+button, 
+.nav-item, 
+.demo-btn, 
+.section-nav-btn, 
+.cta-button, 
+.sidebar-toggle, 
+.lang-toggle,
+.preview-card,
+.collapsible-trigger,
+.tab-btn {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+/* Instant tactile feedback on tap */
+.nav-item:active,
+.demo-btn:active,
+.section-nav-btn:active,
+.cta-button:active,
+.lang-toggle:active,
+.tab-btn:active {
+    transform: scale(0.95) !important;
+    transition: transform 0.1s !important;
+}
+
+.sidebar-toggle:active,
+.collapsible-trigger:active {
+    transform: scale(0.9) !important;
+    transition: transform 0.1s !important;
+}
+
+.preview-card:active {
+    transform: scale(0.98) !important;
+    transition: transform 0.1s !important;
 }
