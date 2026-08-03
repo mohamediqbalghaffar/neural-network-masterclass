@@ -696,6 +696,8 @@ code {
     margin-bottom: 1.5rem;
     transition: all var(--transition-base);
     position: relative;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .topic-card:hover {
@@ -1003,7 +1005,8 @@ code {
     border-spacing: 0;
     margin: 1.25rem 0;
     border-radius: var(--border-radius-sm);
-    overflow: hidden;
+    display: block;
+    overflow-x: auto;
     border: 1px solid var(--glass-border);
 }
 
