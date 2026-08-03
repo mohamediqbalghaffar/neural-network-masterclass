@@ -124,6 +124,125 @@
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="content-grid">
+                <div class="topic-card accent-cyan">
+                    <h3><span class="card-icon">🧠</span> مقايضة التحيز والتباين (Bias-Variance Tradeoff)</h3>
+                    <p>في التعلم العميق، تكون النماذج مفرطة المعلمات (over-parameterized) بشكل كبير. يخبرنا منحنى التحيز والتباين الكلاسيكي على شكل حرف U أنه مع زيادة تعقيد النموذج، ينخفض خطأ التدريب ولكن يرتفع خطأ الاختبار (فرط التخصيص أو Overfitting). ومع ذلك، غالباً ما تظهر الشبكات العصبية "نزولاً مزدوجاً (double descent)" حيث يؤدي الإفراط الشديد في المعلمات في النهاية إلى تحسين أداء الاختبار مرة أخرى.</p>
+                    
+                    <div class="highlight-box info">
+                        <div class="highlight-title">ارتباط بالتحليل</div>
+                        <p>إذا كنت قد استخدمت Random Forests لتقليل التباين مقارنة بأشجار القرار الفردية، فأنت على دراية بأساليب التجميع (ensemble methods). تعمل العديد من تقنيات التنظيم (Regularization) في التعلم العميق (مثل Dropout) ضمنياً كأساليب تجميع واسعة، مع أخذ المتوسط عبر ملايين الشبكات الفرعية.</p>
+                    </div>
+                </div>
+
+                <div class="topic-card accent-pink">
+                    <h3><span class="card-icon">🎲</span> الإسقاط (Dropout)</h3>
+                    <p>الإسقاط (Dropout) هو تقنية تنظيم تصادفية يتم فيها تجاهل خلايا عصبية محددة عشوائياً أثناء التدريب. هذا يجبر الشبكة على تعلم تمثيلات زائدة عن الحاجة ويمنع التكيف المشترك المعقد بين خلايا عصبية معينة.</p>
+                    
+                    <div class="math-block">
+                        <span class="math-display">
+                            y = f(W(x \\\\odot r) + b) \\\\quad \\\\text{حيث } r_i \\\\sim \\\\text{Bernoulli}(p)
+                        </span>
+                    </div>
+                    
+                    <p>أثناء الاستدلال (inference)، يتم إيقاف تشغيل الإسقاط، ويتم قياس الأوزان باحتمالية الإسقاط <span class="math-inline">p</span> لتتطابق مع القيم المتوقعة.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header">مثال PyTorch</div>
+                        <pre><code><span class="code-keyword">import</span> torch.nn <span class="code-keyword">as</span> nn
+
+<span class="code-keyword">class</span> <span class="code-class">RegularizedNetwork</span>(nn.Module):
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(self):
+        <span class="code-built_in">super</span>().__init__()
+        self.fc1 = nn.Linear(<span class="code-number">784</span>, <span class="code-number">256</span>)
+        self.dropout = nn.Dropout(p=<span class="code-number">0.5</span>) <span class="code-comment"># فرصة 50% للإسقاط</span>
+        self.fc2 = nn.Linear(<span class="code-number">256</span>, <span class="code-number">10</span>)</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-emerald">
+                <h3><span class="card-icon">📏</span> طبقات التسوية (Normalization)</h3>
+                <p>يعد تدريب الشبكات العميقة أمراً صعباً بسبب "التحول المتغير الداخلي" — حيث يتغير توزيع مدخلات كل طبقة أثناء التدريب. تعمل تقنيات التسوية على استقرار ذلك من خلال توحيد التنشيطات الوسيطة.</p>
+
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الطريقة</th>
+                                <th>الآلية</th>
+                                <th>الأفضل لـ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>تسوية الدفعة (Batch Norm)</strong></td>
+                                <td>يسوي عبر بُعد الدفعة. يحسب المتوسط/التباين لكل ميزة عبر الدفعة.</td>
+                                <td>الشبكات التلافيفية (CNNs)، شبكات التغذية الأمامية. (يعاني مع الدفعات الصغيرة).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>تسوية الطبقة (Layer Norm)</strong></td>
+                                <td>يسوي عبر بُعد الميزة لكل تسلسل/مثال مستقل.</td>
+                                <td>المحولات (Transformers)، الشبكات المتكررة (RNNs)، الدفعات الصغيرة.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="math-block">
+                    <span class="math-display">
+                        \\\\hat{x}_i = \\\\frac{x_i - \\\\mu}{\\\\sqrt{\\\\sigma^2 + \\\\epsilon}}, \\\\quad y_i = \\\\gamma \\\\hat{x}_i + \\\\beta
+                    </span>
+                </div>
+                <p>تسمح المعلمات القابلة للتعلم <span class="math-inline">\\\\gamma</span> و <span class="math-inline">\\\\beta</span> للشبكة بالتراجع عن التسوية إذا لم تكن الميزات الموحدة هي الأمثل للطبقة التالية.</p>
+            </div>
+            
+            <div class="topic-card accent-amber">
+                <h3><span class="card-icon">⚖️</span> تنظيم L1 و L2 (اضمحلال الوزن)</h3>
+                <p>تماماً مثل انحدار Ridge و Lasso، يمكننا إضافة مصطلح عقوبة إلى دالة الخسارة لتقييد حجم الأوزان.</p>
+                
+                <div class="tabs">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="l2-reg">L2 (Ridge)</button>
+                        <button class="tab-btn" data-tab="l1-reg">L1 (Lasso)</button>
+                    </div>
+                    <div class="tab-panel active" id="l2-reg">
+                        <h4>تنظيم L2 (اضمحلال الوزن - Weight Decay)</h4>
+                        <p>يعاقب المقدار المربع للأوزان. يشجع الشبكة على استخدام جميع المدخلات قليلاً، بدلاً من الاعتماد بشكل كبير على إدخال واحد. ينعم سطح الخسارة.</p>
+                        <div class="math-block">
+                            <span class="math-display">
+                                L_{total} = L_{data} + \\\\frac{\\\\lambda}{2} \\\\sum w_i^2
+                            </span>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="l1-reg">
+                        <h4>تنظيم L1</h4>
+                        <p>يعاقب المقدار المطلق للأوزان. يعزز التناثر (sparsity)، مما يدفع العديد من الأوزان لتصبح صفراً تماماً. مفيد لاختيار الميزات.</p>
+                        <div class="math-block">
+                            <span class="math-display">
+                                L_{total} = L_{data} + \\\\lambda \\\\sum |w_i|
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-purple">
+                <h3><span class="card-icon">📈</span> عرض تفاعلي: محاكي فرط التخصيص (Overfitting)</h3>
+                <p>شاهد كيف تتطور منحنيات خسارة التدريب والتحقق عبر الحقب (epochs). قم بتعديل تعقيد النموذج وأضف التنظيم (الإسقاط، اضمحلال الوزن L2) لملاحظة كيف يمكنك سد فجوة التعميم.</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+
+            <div class="key-takeaway">
+                <h4>🔑 أهم النقاط</h4>
+                <ul>
+                    <li>تميل نماذج التعلم العميق بشكل طبيعي إلى فرط التخصيص لأنها تحتوي على معلمات أكثر بكثير من عينات التدريب.</li>
+                    <li><strong>التنظيم (Regularization)</strong> هو أي تعديل يهدف إلى تقليل خطأ الاختبار، حتى على حساب زيادة خطأ التدريب.</li>
+                    <li>راقب دائمًا <strong>خسارة التحقق (validation loss)</strong> لاكتشاف فرط التخصيص. <strong>التوقف المبكر (Early Stopping)</strong> هو أسلوب التنظيم الأبسط والأكثر فعالية.</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             const canvas = container.querySelector('canvas');
             if (!canvas) return;

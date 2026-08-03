@@ -94,6 +94,95 @@
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="content-grid">
+                <div class="topic-card accent-purple">
+                    <h3><span class="card-icon">🔄</span> الشبكات العصبية المتكررة القياسية (Vanilla RNNs)</h3>
+                    <p>على عكس الشبكات ذات التغذية الأمامية القياسية، تحتوي الشبكات العصبية المتكررة (RNNs) على حلقات (loops)، مما يسمح باستمرار المعلومات. يعالجون التسلسلات عن طريق الحفاظ على <strong>حالة مخفية (hidden state)</strong> تعمل كـ "ذاكرة" للشبكة عبر خطوات زمنية.</p>
+                    
+                    <div class="math-block">
+                        <span class="math-display">h_t = \\tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)</span>
+                        <span class="math-display">y_t = W_{hy} h_t + b_y</span>
+                    </div>
+
+                    <p>بشكل حاسم، تستخدم RNN <strong>أوزاناً مشتركة</strong> ($W_{hh}, W_{xh}$) عبر جميع الخطوات الزمنية، مما يسمح لها بالتعميم على تسلسلات ذات أطوال مختلفة.</p>
+                </div>
+
+                <div class="topic-card accent-cyan">
+                    <h3><span class="card-icon">📉</span> مشكلة تلاشي التدرج (Vanishing Gradient)</h3>
+                    <p>عند التدريب عبر الانتشار الخلفي عبر الزمن (BPTT)، يتضمن تدرج الخسارة بالنسبة للخطوات الزمنية المبكرة ضرباً متكرراً لمصفوفة الوزن المتكرر $W_{hh}$.</p>
+                    
+                    <div class="math-block">
+                        <span class="math-display">\\frac{\\partial h_t}{\\partial h_k} = \\prod_{i=k+1}^t \\frac{\\partial h_i}{\\partial h_{i-1}}</span>
+                    </div>
+
+                    <div class="highlight-box warning">
+                        <h4 class="highlight-title">التبعيات طويلة المدى (Long-Term Dependencies)</h4>
+                        <p>إذا كانت القيم الذاتية (eigenvalues) لـ $W_{hh}$ هي $< 1$، فإن التدرج يتقلص أسياً إلى الصفر. "تنسى" الشبكة السياق المبكر. إذا كانت $> 1$، تنفجر التدرجات. هذا يجعل RNNs القياسية تفشل في مهام التسلسل الطويل.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-emerald">
+                <h3><span class="card-icon">🧠</span> LSTMs و GRUs</h3>
+                <p>تحل شبكات الذاكرة طويلة قصيرة المدى (LSTM) مشكلة تلاشي التدرج عن طريق إدخال <strong>حالة خلية (cell state)</strong> داخلية ($C_t$) وآليات بوابات (gating) للتحكم في تدفق المعلومات.</p>
+                
+                <div class="tabs">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="tab-lstm">معمارية LSTM</button>
+                        <button class="tab-btn" data-tab="tab-gru">معمارية GRU</button>
+                    </div>
+                    
+                    <div class="tab-panel active" id="tab-lstm" style="padding-top: 1rem;">
+                        <ul>
+                            <li><strong>بوابة النسيان (Forget Gate):</strong> تقرر المعلومات التي يجب التخلص منها من حالة الخلية.</li>
+                            <li><strong>بوابة الإدخال (Input Gate):</strong> تقرر المعلومات الجديدة التي يجب إضافتها إلى حالة الخلية.</li>
+                            <li><strong>بوابة الإخراج (Output Gate):</strong> تقرر ما سيتم إخراجه بناءً على حالة الخلية المحدثة.</li>
+                        </ul>
+                        <div class="math-block">
+                            <span class="math-display">f_t = \\sigma(W_f \\cdot [h_{t-1}, x_t] + b_f)</span>
+                            <span class="math-display">C_t = f_t * C_{t-1} + i_t * \\tilde{C}_t</span>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="tab-gru" style="padding-top: 1rem;">
+                        <p>تبسط الوحدات المتكررة ذات البوابات (GRUs) شبكات LSTMs عن طريق دمج حالة الخلية والحالة المخفية، ودمج بوابات النسيان والإدخال في <strong>بوابة تحديث (update gate)</strong> واحدة.</p>
+                        <p>تؤدي GRUs عادةً أداءً جيداً مثل LSTMs ولكنها أسرع في التدريب بسبب قلة عدد المعلمات.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="topic-card accent-pink">
+                    <h3><span class="card-icon">🏗️</span> نماذج Seq2Seq</h3>
+                    <p>تستخدم نماذج التسلسل إلى التسلسل (Seq2Seq) معمارية <strong>المشفر-المفكك (Encoder-Decoder)</strong>، وهي مثالية للترجمة الآلية أو التنبؤ.</p>
+                    <div class="flow-diagram" style="font-size: 0.9rem;">
+                        <div class="flow-node"><strong>المشفر (Encoder)</strong><br>يعالج تسلسل الإدخال</div>
+                        <div class="flow-arrow">→ متجه السياق →</div>
+                        <div class="flow-node"><strong>المفكك (Decoder)</strong><br>يولد تسلسل الإخراج</div>
+                    </div>
+                </div>
+
+                <div class="topic-card accent-amber">
+                    <h3><span class="card-icon">📊</span> ارتباط بالتحليل: السلاسل الزمنية</h3>
+                    <p>في التحليلات التقليدية، نستخدم ARIMA أو التمهيد الأسي (exponential smoothing) للسلاسل الزمنية. توسع RNNs هذه عن طريق التعامل بشكل طبيعي مع العلاقات الزمنية متعددة المتغيرات غير الخطية دون هندسة ميزات يدوية للتأخيرات (lags).</p>
+                </div>
+            </div>
+
+            <div class="topic-card accent-cyan">
+                <h3><span class="card-icon">🎮</span> عرض تفاعلي: فتح RNN عبر الزمن</h3>
+                <p>شاهد كيف يتم تحديث الحالة المخفية في كل خطوة زمنية بينما تعالج الشبكة تسلسل "DATA". تشير كثافة اللون إلى حجم متجه الحالة المخفية.</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+
+            <div class="key-takeaway">
+                <h4>أهم النقاط</h4>
+                <ul>
+                    <li><strong>التكرار (Recurrence):</strong> تعالج RNNs البيانات الزمنية/المتسلسلة عن طريق إعادة تغذية الحالة المخفية إلى نفسها.</li>
+                    <li><strong>البوابات (Gating) تحل تلاشي التدرجات:</strong> تستخدم LSTMs و GRUs بوابات قابلة للتعلم للحفاظ على مسارات "مضافة" عبر الزمن.</li>
+                    <li><strong>التنوع:</strong> تدعم طبولوجيا RNN واحد-إلى-كثير (one-to-many)، كثير-إلى-واحد (many-to-one)، وكثير-إلى-كثير (many-to-many).</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             const canvas = container.querySelector('canvas');
             if (!canvas) return;

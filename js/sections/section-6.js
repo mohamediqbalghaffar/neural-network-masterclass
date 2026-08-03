@@ -123,6 +123,124 @@ model.add(tf.layers.dense({units: <span class="code-number">10</span>, activatio
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="content-grid">
+                <div class="topic-card accent-cyan">
+                    <h3><span class="card-icon">🔲</span> عملية الالتفاف (Convolution)</h3>
+                    <p>أحدثت الشبكات العصبية التلافيفية (CNNs) ثورة في رؤية الكمبيوتر (Computer Vision) عن طريق استبدال الطبقات الكثيفة والمتصلة بالكامل بـ <strong>طبقات تلافيفية</strong>. في معالجة الإشارات، يمزج الالتفاف دالتين معاً. في معالجة الصور، نقوم بتمرير مصفوفة صغيرة (<strong>نواة kernel</strong> أو مرشح filter) فوق الصورة، وحساب النواتج النقطية (dot products) لاكتشاف الأنماط.</p>
+                    
+                    <div class="math-block">
+                        <span class="math-display">S(i, j) = (I * K)(i, j) = \\sum_m \\sum_n I(i+m, j+n) K(m, n)</span>
+                    </div>
+                    
+                    <div class="highlight-box info">
+                        <h4 class="highlight-title">ارتباط بالتحليل: المتوسطات المتحركة</h4>
+                        <p>إذا قمت بحساب متوسط متحرك أو قمت بتنعيم مجموعة بيانات سلسلة زمنية، فقد قمت بإجراء التفاف 1D! تقوم CNN ببساطة بتوسيع هذا المفهوم إلى 2D (أو 3D) و <em>تتعلم</em> أوزان التنعيم/التصفية المثلى (النواة) بدلاً من أن تقوم ببرمجتها يدوياً.</p>
+                    </div>
+                </div>
+
+                <div class="topic-card accent-purple">
+                    <h3><span class="card-icon">📐</span> الأبعاد المكانية: الحشو والخطوة (Padding & Stride)</h3>
+                    <p>بينما نقوم بتمرير المرشحات عبر صورة، يتغير حجم الإخراج بناءً على ثلاثة عوامل:</p>
+                    <ul>
+                        <li><strong>حجم النواة ($K$):</strong> بُعد المرشح (غالباً 3x3 أو 5x5).</li>
+                        <li><strong>الخطوة ($S$ - Stride):</strong> حجم خطوة النافذة المنزلقة. الخطوة الأكبر تقلل من حجم الصورة (downsamples).</li>
+                        <li><strong>الحشو ($P$ - Padding):</strong> إضافة أصفار حول حدود الصورة للتحكم في حجم الإخراج.</li>
+                    </ul>
+                    
+                    <p>صيغة البعد المكاني لحجم إدخال $W$ هي:</p>
+                    <div class="math-block">
+                        <span class="math-display">O = \\lfloor \\frac{W - K + 2P}{S} \\rfloor + 1</span>
+                    </div>
+
+                    <h4>طبقات التجميع (Pooling Layers)</h4>
+                    <p>عادةً ما تتخلل شبكات CNN التلافيف بـ <strong>طبقات التجميع</strong> (مثل Max Pooling أو Average Pooling) لتقليل الأبعاد المكانية بشكل كبير وإنشاء ثبات انتقالي (translation invariance).</p>
+                </div>
+            </div>
+
+            <div class="topic-card accent-emerald">
+                <h3><span class="card-icon">🏛️</span> الجدول الزمني للمعماريات البارزة</h3>
+                <div class="flow-diagram">
+                    <div class="flow-node"><strong>LeNet (1998)</strong><br><small>التعرف على الأرقام</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node"><strong>AlexNet (2012)</strong><br><small>طفرة التعلم العميق</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node"><strong>VGG (2014)</strong><br><small>مرشحات 3x3 عميقة</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node"><strong>ResNet (2015)</strong><br><small>اتصالات التخطي (Skip Connections)</small></div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-node"><strong>EfficientNet (2019)</strong><br><small>القياس المركب (Compound Scaling)</small></div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="topic-card accent-amber">
+                    <h3><span class="card-icon">🎨</span> خرائط الميزات والتسلسل الهرمي</h3>
+                    <p>تتعلم شبكات CNN تمثيلات هرمية. مع تدفق البيانات بشكل أعمق في الشبكة، تمثل خرائط الميزات مفاهيم متزايدة التعقيد:</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>عمق الطبقة</th>
+                                <th>ما تتعلمه</th>
+                                <th>تشبيه بالتحليل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>الطبقات المبكرة</strong></td>
+                                <td>الحواف، الألوان، التدرجات</td>
+                                <td>استخراج الميزات الخام</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الطبقات المتوسطة</strong></td>
+                                <td>الأنسجة، الأشكال البسيطة (دوائر، زوايا)</td>
+                                <td>تفاعلات الميزات</td>
+                            </tr>
+                            <tr>
+                                <td><strong>الطبقات العميقة</strong></td>
+                                <td>الأشياء المعقدة (وجوه، عجلات، نص)</td>
+                                <td>مجموعات دلالية عالية المستوى</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="topic-card accent-pink">
+                    <h3><span class="card-icon">♻️</span> نقل التعلم والضبط الدقيق (Transfer Learning)</h3>
+                    <p>يتطلب تدريب CNN عميقة من الصفر بيانات وحوسبة هائلة. بدلاً من ذلك، نستخدم <strong>نقل التعلم</strong>:</p>
+                    <div class="code-block">
+                        <div class="code-block-header">Keras: نقل التعلم</div>
+                        <pre><code><span class="code-comment"># 1. تحميل القاعدة المدربة مسبقاً (تجميد الأوزان)</span>
+<span class="code-keyword">const</span> baseModel = tf.applications.ResNet50({
+    weights: <span class="code-string">'imagenet'</span>,
+    includeTop: <span class="code-keyword">false</span>
+});
+baseModel.trainable = <span class="code-keyword">false</span>;
+
+<span class="code-comment"># 2. إضافة رأس تحليل مخصص</span>
+<span class="code-keyword">const</span> model = tf.sequential();
+model.add(baseModel);
+model.add(tf.layers.globalAveragePooling2d());
+model.add(tf.layers.dense({units: <span class="code-number">10</span>, activation: <span class="code-string">'softmax'</span>}));</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-cyan">
+                <h3><span class="card-icon">🎮</span> عرض تفاعلي: تصور مرشح CNN</h3>
+                <p>حدد مرشح النواة (kernel). يحرك العرض التوضيحي كيف ينزلق المرشح فوق صورة إدخال 6x6 (يسار) لإنتاج خريطة ميزات 4x4 (يمين) بدون حشو ($S=1, P=0$).</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+
+            <div class="key-takeaway">
+                <h4>أهم النقاط</h4>
+                <ul>
+                    <li><strong>مشاركة الأوزان:</strong> تكتسح نواة واحدة الصورة، مما يقلل بشكل كبير من عدد المعلمات مقارنة بالطبقات الكثيفة.</li>
+                    <li><strong>المحلية (Locality):</strong> يفترض الالتفاف بطبيعته أن البكسلات القريبة مرتبطة ارتباطاً وثيقاً.</li>
+                    <li><strong>التسلسل الهرمي:</strong> تبني شبكات CNN العميقة تمثيلات دلالية معقدة من حواف بسيطة.</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             const canvas = container.querySelector('canvas');
             if (!canvas) return;

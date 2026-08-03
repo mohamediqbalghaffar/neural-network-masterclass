@@ -9,17 +9,25 @@ const NeuralApp = (function () {
     // ── Section Registry ──────────────────────────────────────
     const sections = {};
     const sectionMeta = [
-        { id: 1,  icon: '🌉', title: 'From Analytics to Neural Networks', subtitle: 'Bridge what you know to the neural world' },
-        { id: 2,  icon: '🧠', title: 'Foundations of Neural Networks',    subtitle: 'Neurons, layers, and forward propagation' },
-        { id: 3,  icon: '⚡', title: 'Activation & Loss Functions',       subtitle: 'The mathematical engine room' },
-        { id: 4,  icon: '🔄', title: 'Training & Backpropagation',       subtitle: 'How neural networks learn from data' },
-        { id: 5,  icon: '🛡️', title: 'Regularization & Generalization',  subtitle: 'Preventing overfitting, building robustness' },
-        { id: 6,  icon: '👁️', title: 'Convolutional Neural Networks',     subtitle: 'Spatial pattern recognition for images' },
-        { id: 7,  icon: '📝', title: 'Recurrent Networks & Sequences',   subtitle: 'Modeling time-series and text' },
-        { id: 8,  icon: '🤖', title: 'Transformers & Attention',         subtitle: 'The architecture powering modern AI' },
-        { id: 9,  icon: '🎨', title: 'Generative Models & Modern AI',    subtitle: 'Creating new data: images, text, and beyond' },
-        { id: 10, icon: '🔍', title: 'Interpretability, Ethics & Analytics', subtitle: 'Making neural networks trustworthy' },
+        { id: 1,  icon: '🌉', titleEn: 'From Analytics to Neural Networks', subtitleEn: 'Bridge what you know to the neural world', titleAr: 'من تحليل البيانات للشبكات العصبية', subtitleAr: 'اربط بين معرفتك السابقة وعالم الذكاء الاصطناعي' },
+        { id: 2,  icon: '🧠', titleEn: 'Foundations of Neural Networks',    subtitleEn: 'Neurons, layers, and forward propagation', titleAr: 'أساسيات الشبكات العصبية', subtitleAr: 'الخلايا، الطبقات، والانتشار الأمامي' },
+        { id: 3,  icon: '⚡', titleEn: 'Activation & Loss Functions',       subtitleEn: 'The mathematical engine room', titleAr: 'دوال التنشيط وحساب الخسارة', subtitleAr: 'المحرك الرياضي للشبكات العصبية' },
+        { id: 4,  icon: '🔄', titleEn: 'Training & Backpropagation',       subtitleEn: 'How neural networks learn from data', titleAr: 'التدريب والانتشار الخلفي', subtitleAr: 'كيف تتعلم الشبكات من البيانات' },
+        { id: 5,  icon: '🛡️', titleEn: 'Regularization & Generalization',  subtitleEn: 'Preventing overfitting, building robustness', titleAr: 'التنظيم والتعميم', subtitleAr: 'منع فرط التخصيص وبناء نماذج قوية' },
+        { id: 6,  icon: '👁️', titleEn: 'Convolutional Neural Networks',     subtitleEn: 'Spatial pattern recognition for images', titleAr: 'الشبكات العصبية التلافيفية', subtitleAr: 'التعرف على الأنماط المكانية للصور' },
+        { id: 7,  icon: '📝', titleEn: 'Recurrent Networks & Sequences',   subtitleEn: 'Modeling time-series and text', titleAr: 'الشبكات المتكررة والسلاسل', subtitleAr: 'نمذجة السلاسل الزمنية والنصوص' },
+        { id: 8,  icon: '🤖', titleEn: 'Transformers & Attention',         subtitleEn: 'The architecture powering modern AI', titleAr: 'المحولات والانتباه', subtitleAr: 'البنية التي تشغل الذكاء الاصطناعي الحديث' },
+        { id: 9,  icon: '🎨', titleEn: 'Generative Models & Modern AI',    subtitleEn: 'Creating new data: images, text, and beyond', titleAr: 'النماذج التوليدية', subtitleAr: 'إنشاء بيانات جديدة: صور، نصوص، والمزيد' },
+        { id: 10, icon: '🔍', titleEn: 'Interpretability, Ethics & Analytics', subtitleEn: 'Making neural networks trustworthy', titleAr: 'قابلية التفسير والأخلاقيات', subtitleAr: 'جعل الشبكات العصبية جديرة بالثقة' },
     ];
+    
+    function getMeta(sec) {
+        const lang = I18n.getLanguage();
+        return {
+            title: lang === 'ar' ? sec.titleAr : sec.titleEn,
+            subtitle: lang === 'ar' ? sec.subtitleAr : sec.subtitleEn
+        };
+    }
 
     // ── State ─────────────────────────────────────────────────
     let currentSection = 'welcome';
@@ -40,41 +48,83 @@ const NeuralApp = (function () {
         initSidebarToggle();
         bindNavigation();
         loadStateFromStorage();
+        
+        const langBtn = document.getElementById('langToggle');
+        if (langBtn) {
+            langBtn.addEventListener('click', () => {
+                I18n.toggleLanguage();
+                langBtn.textContent = I18n.getLanguage() === 'en' ? 'ع' : 'EN';
+            });
+            langBtn.textContent = I18n.getLanguage() === 'en' ? 'ع' : 'EN';
+        }
+        I18n.setLanguage(I18n.getLanguage());
+
         handleHashNavigation();
+    }
+    
+    function reRender() {
+        buildNav();
+        buildPreviewGrid();
+        updateProgress();
+        if (currentSection !== 'welcome') {
+            renderSection(currentSection);
+        }
+        
+        // Re-apply active states
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const navItem = document.getElementById(currentSection === 'welcome' ? 'nav-welcome' : `nav-${currentSection}`);
+        if (navItem) navItem.classList.add('active');
     }
 
     // ── Navigation ────────────────────────────────────────────
     function buildNav() {
         const nav = document.getElementById('nav');
+        // Clear old generated items
+        nav.querySelectorAll('a:not(#nav-welcome)').forEach(el => el.remove());
+        // Update welcome label
+        const welcomeLabel = document.querySelector('#nav-welcome .nav-label');
+        if (welcomeLabel) welcomeLabel.textContent = I18n.t('nav-welcome');
+        
         sectionMeta.forEach((sec) => {
             const a = document.createElement('a');
             a.href = `#section-${sec.id}`;
             a.className = 'nav-item';
             a.dataset.section = sec.id;
             a.id = `nav-${sec.id}`;
+            const meta = getMeta(sec);
             a.innerHTML = `
                 <span class="nav-icon">${sec.icon}</span>
-                <span class="nav-label">${sec.title}</span>
+                <span class="nav-label">${meta.title}</span>
                 <span class="nav-status"></span>
             `;
             nav.appendChild(a);
+        });
+        
+        // Bind new nav items
+        nav.querySelectorAll('a:not(#nav-welcome)').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                navigateTo(item.dataset.section);
+            });
         });
     }
 
     function buildPreviewGrid() {
         const grid = document.getElementById('sectionGrid');
         if (!grid) return;
+        grid.innerHTML = ''; // clear for rerender
         sectionMeta.forEach((sec) => {
             const card = document.createElement('div');
             card.className = 'preview-card';
             card.dataset.section = sec.id;
+            const meta = getMeta(sec);
             card.innerHTML = `
                 <div class="preview-card-header">
                     <span class="preview-card-number">${String(sec.id).padStart(2, '0')}</span>
                     <span class="preview-card-icon">${sec.icon}</span>
                 </div>
-                <h3>${sec.title}</h3>
-                <p>${sec.subtitle}</p>
+                <h3>${meta.title}</h3>
+                <p>${meta.subtitle}</p>
             `;
             card.addEventListener('click', () => navigateTo(sec.id));
             grid.appendChild(card);
@@ -159,12 +209,15 @@ const NeuralApp = (function () {
         const container = document.getElementById('sectionContainer');
         const section = sections[id];
         const meta = sectionMeta.find((s) => s.id === id);
+        const lang = I18n.getLanguage();
+        const contentHtml = (lang === 'ar' && section.contentAr) ? section.contentAr : section.content;
+        const metaLocal = getMeta(meta);
 
         if (!section || !meta) {
             container.innerHTML = `
                 <div class="page-section section-page active" style="text-align:center; padding: 4rem;">
-                    <h2 style="margin-bottom:1rem;">🚧 Section ${id} Coming Soon</h2>
-                    <p>This section is being built by our AI agents. Check back shortly!</p>
+                    <h2 style="margin-bottom:1rem;">${I18n.t('coming-soon', {id})}</h2>
+                    <p>${I18n.t('coming-soon-desc')}</p>
                     ${buildSectionNav(id)}
                 </div>
             `;
@@ -181,16 +234,16 @@ const NeuralApp = (function () {
         page.innerHTML = `
             <div class="section-header">
                 <div class="section-badge">${String(id).padStart(2, '0')} / 10</div>
-                <h2><span class="section-icon">${meta.icon}</span>${meta.title}</h2>
-                <p>${meta.subtitle}</p>
+                <h2><span class="section-icon">${meta.icon}</span>${metaLocal.title}</h2>
+                <p>${metaLocal.subtitle}</p>
             </div>
             <div class="section-body">
-                ${section.content}
+                ${contentHtml}
             </div>
             <div class="demo-container" id="demo-area-${id}">
                 <div class="demo-header">
                     <div class="demo-title">
-                        🎮 Interactive Demo <span class="demo-badge">LIVE</span>
+                        ${I18n.t('interactive-demo')}
                     </div>
                 </div>
                 <div class="demo-canvas-container">
@@ -237,8 +290,12 @@ const NeuralApp = (function () {
     function buildSectionNav(currentId) {
         const prevId = currentId > 1 ? currentId - 1 : 'welcome';
         const nextId = currentId < 10 ? currentId + 1 : null;
-        const prevLabel = currentId > 1 ? sectionMeta[currentId - 2].title : 'Welcome';
-        const nextLabel = nextId ? sectionMeta[nextId - 1].title : null;
+        
+        let prevLabel = I18n.t('nav-welcome');
+        if (currentId > 1) prevLabel = getMeta(sectionMeta[currentId - 2]).title;
+        
+        let nextLabel = null;
+        if (nextId) nextLabel = getMeta(sectionMeta[nextId - 1]).title;
 
         return `
             <div class="section-nav">
@@ -251,7 +308,7 @@ const NeuralApp = (function () {
                     </button>
                 ` : `
                     <button class="section-nav-btn next" data-target="welcome">
-                        🏠 Back to Home
+                        ${I18n.t('back-to-home')}
                     </button>
                 `}
             </div>
@@ -312,7 +369,7 @@ const NeuralApp = (function () {
         const fill = document.getElementById('progressFill');
         const text = document.getElementById('progressText');
         if (fill) fill.style.width = `${(count / 10) * 100}%`;
-        if (text) text.textContent = `${count} / 10 Sections`;
+        if (text) text.textContent = `${count} / 10 ${I18n.t('stat-sections')}`;
 
         // Update nav completed states
         completedSections.forEach((id) => {
@@ -469,6 +526,7 @@ const NeuralApp = (function () {
     // ── Expose API ────────────────────────────────────────────
     return {
         init,
+        reRender,
         registerSection,
         navigateTo,
         sections,

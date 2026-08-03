@@ -144,6 +144,145 @@
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="content-grid">
+                <div class="topic-card accent-cyan">
+                    <h3><span class="card-icon">📉</span> متغيرات النزول الاشتقاقي</h3>
+                    <p>على عكس الانحدار الخطي حيث لدينا حل تحليلي مغلق (المعادلة العادية: <span class="math-inline">\\\\theta = (X^T X)^{-1} X^T y</span>)، تمتلك الشبكات العصبية أسطح خسارة غير محدبة بدرجة كبيرة. يجب أن نعتمد على إجراءات تحسين تكرارية مثل النزول الاشتقاقي (Gradient Descent).</p>
+                    
+                    <div class="highlight-box info">
+                        <div class="highlight-title">ارتباط بالتحليل</div>
+                        <p>في الإحصاء الكلاسيكي، غالباً ما يؤدي تعظيم الاحتمالية إلى حلول تحليلية مباشرة. في التعلم العميق، يجبرنا التعقيد الهيكلي على اتخاذ خطوات صغيرة تتناسب مع التدرج السلبي لدالة الخسارة عند النقطة الحالية.</p>
+                    </div>
+
+                    <p>هناك ثلاثة متغيرات رئيسية بناءً على مقدار البيانات التي نستخدمها لحساب التدرج:</p>
+                    <ul>
+                        <li><strong>النزول الاشتقاقي الدفعي (Batch):</strong> يستخدم مجموعة البيانات بأكملها. تدرجات دقيقة، لكنها مكلفة حسابياً لمجموعات البيانات الكبيرة.</li>
+                        <li><strong>النزول الاشتقاقي العشوائي (SGD):</strong> يستخدم مثالاً واحداً. تدرجات صاخبة جداً، لكن التحديثات سريعة جداً.</li>
+                        <li><strong>النزول الاشتقاقي الدفعي المصغر (Mini-batch):</strong> النهج القياسي. يستخدم دفعة صغيرة (مثل 32، 64، 256). يوازن بين دقة التدرج والكفاءة الحسابية، مع الاستفادة القصوى من توجيهات وحدة معالجة الرسومات.</li>
+                    </ul>
+                </div>
+
+                <div class="topic-card accent-purple">
+                    <h3><span class="card-icon">⛓️</span> خوارزمية الانتشار الخلفي</h3>
+                    <p>الانتشار الخلفي هو تطبيق فعال لقاعدة السلسلة من التفاضل والتكامل على رسم بياني حسابي. يحسب تدرج الخسارة بالنسبة لكل وزن في الشبكة.</p>
+                    
+                    <div class="math-block">
+                        <span class="math-display">
+                            \\\\frac{\\\\partial L}{\\\\partial w} = \\\\frac{\\\\partial L}{\\\\partial \\\\hat{y}} \\\\cdot \\\\frac{\\\\partial \\\\hat{y}}{\\\\partial z} \\\\cdot \\\\frac{\\\\partial z}{\\\\partial w}
+                        </span>
+                    </div>
+                    
+                    <p>أثناء <strong>المسار الأمامي</strong>، نحسب التنشيطات ونخزن القيم الوسيطة. أثناء <strong>المسار الخلفي</strong>، نحسب مصطلح الخطأ (أو "التدرج المحلي") عند طبقة الإخراج وننشره للخلف عبر طبقات الشبكة.</p>
+
+                    <div class="code-block">
+                        <div class="code-block-header">مفهوم Autograd (Python/PyTorch)</div>
+                        <pre><code><span class="code-keyword">def</span> <span class="code-function">backward</span>(loss):
+    <span class="code-comment"># حساب تدرج الإخراج</span>
+    grad = compute_loss_grad(output, target)
+    
+    <span class="code-comment"># الانتشار للخلف</span>
+    <span class="code-keyword">for</span> layer <span class="code-keyword">in</span> <span class="code-built_in">reversed</span>(layers):
+        grad = layer.backward(grad)
+        <span class="code-comment"># تقوم الطبقة بتحديث أوزانها باستخدام المدخلات المخزنة</span></code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-emerald">
+                <h3><span class="card-icon">🏎️</span> محسنات متقدمة (Optimizers)</h3>
+                <p>غالباً ما يعاني SGD العادي مع الانحناءات المرضية (مثل الوديان) ويمكن أن يعلق بسهولة في النقاط السرجية (saddle points). تعالج المحسنات الحديثة هذه المشكلات من خلال تتبع تاريخ التدرجات.</p>
+
+                <div class="tabs">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="opt-momentum">الزخم (Momentum)</button>
+                        <button class="tab-btn" data-tab="opt-rmsprop">RMSProp</button>
+                        <button class="tab-btn" data-tab="opt-adam">Adam</button>
+                    </div>
+                    <div class="tab-panel active" id="opt-momentum">
+                        <h4>SGD مع الزخم</h4>
+                        <p>يحاكي كرة تتدحرج أسفل تل. يجمع متوسطاً متحركاً متناقصاً أسياً للتدرجات السابقة ويستمر في التحرك في اتجاهها.</p>
+                        <div class="math-block">
+                            <span class="math-display">
+                                v_t = \\\\beta v_{t-1} + (1 - \\\\beta) \\\\nabla_w L(w_t) \\\\\\\\
+                                w_{t+1} = w_t - \\\\eta v_t
+                            </span>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="opt-rmsprop">
+                        <h4>RMSProp</h4>
+                        <p>يكيف معدل التعلم لكل معلمة عن طريق قسمة معدل التعلم على متوسط متناقص أسياً لمربعات التدرجات. رائع للشبكات العصبية المتكررة.</p>
+                        <div class="math-block">
+                            <span class="math-display">
+                                s_t = \\\\beta s_{t-1} + (1 - \\\\beta) (\\\\nabla_w L(w_t))^2 \\\\\\\\
+                                w_{t+1} = w_t - \\\\frac{\\\\eta}{\\\\sqrt{s_t + \\\\epsilon}} \\\\nabla_w L(w_t)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="opt-adam">
+                        <h4>Adam (تقدير العزم التكيفي)</h4>
+                        <p>يجمع بين أفكار Momentum و RMSProp. يتتبع كلاً من العزم الأول (المتوسط) والعزم الثاني (التباين غير الممركز) للتدرجات.</p>
+                        <div class="math-block">
+                            <span class="math-display">
+                                m_t = \\\\beta_1 m_{t-1} + (1 - \\\\beta_1) g_t \\\\\\\\
+                                v_t = \\\\beta_2 v_{t-1} + (1 - \\\\beta_2) g_t^2 \\\\\\\\
+                                \\\\hat{m}_t = \\\\frac{m_t}{1 - \\\\beta_1^t}, \\\\quad \\\\hat{v}_t = \\\\frac{v_t}{1 - \\\\beta_2^t} \\\\\\\\
+                                w_{t+1} = w_t - \\\\frac{\\\\eta}{\\\\sqrt{\\\\hat{v}_t} + \\\\epsilon} \\\\hat{m}_t
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="topic-card accent-amber">
+                <h3><span class="card-icon">🎛️</span> جداول معدل التعلم والإحماء</h3>
+                <p>نادراً ما يكون معدل التعلم الثابت هو الأمثل. هناك حاجة لمعدلات تعلم عالية في وقت مبكر للهروب من الحد الأدنى المحلي، في حين أن هناك حاجة لمعدلات تعلم منخفضة لاحقاً للضبط الدقيق.</p>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاستراتيجية</th>
+                                <th>الوصف</th>
+                                <th>حالة الاستخدام</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Step Decay</strong></td>
+                                <td>تقليل معدل التعلم بعامل (مثل 0.1) كل N حقبة (epochs).</td>
+                                <td>مهام تصنيف الصور القياسية (ResNet على ImageNet).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cosine Annealing</strong></td>
+                                <td>تقليل معدل التعلم بسلاسة باتباع منحنى جيب التمام.</td>
+                                <td>التدريب العدواني، وغالباً ما يستخدم مع إعادة التشغيل للعثور على حد أدنى قوي.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Linear Warm-up</strong></td>
+                                <td>البدء بمعدل تعلم يقترب من الصفر وزيادته خطياً خلال الحقب الأولى.</td>
+                                <td>معماريات المحولات (Transformers)، لمنع التباعد المبكر.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="topic-card accent-pink">
+                <h3><span class="card-icon">🎮</span> عرض تفاعلي: متجول التضاريس للنزول الاشتقاقي</h3>
+                <p>راقب كيف تعبر المحسنات المختلفة سطح خسارة غير محدب (دالة هيملبلو). لاحظ كيف يهرب Adam من المناطق المسطحة بسرعة بينما يمكن أن يتجاوز الزخم (Momentum) الحد الأدنى.</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+
+            <div class="key-takeaway">
+                <h4>🔑 أهم النقاط</h4>
+                <ul>
+                    <li>التدريب هو ببساطة عملية تقليل دالة خسارة غير محدبة عالية الأبعاد.</li>
+                    <li>يستخدم الانتشار الخلفي قاعدة السلسلة لحساب التدرجات بكفاءة عن طريق إعادة استخدام التنشيطات الوسيطة.</li>
+                    <li>Adam هو عادة أفضل محسن افتراضي، ولكن SGD المضبوط بعناية مع الزخم يمكن أن يؤدي أحياناً إلى تعميم أفضل في مهام الصور.</li>
+                    <li>جدولة معدل التعلم والإحماء أمر بالغ الأهمية لتدريب المعماريات العميقة الحديثة مثل المحولات (Transformers).</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             const canvas = container.querySelector('canvas');
             if (!canvas) return;

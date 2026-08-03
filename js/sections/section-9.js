@@ -99,6 +99,100 @@
     </ul>
 </div>
 `,
+        contentAr: `
+<div class="section-intro">
+    <h2>النماذج التوليدية والذكاء الاصطناعي الحديث (Generative Models & Modern AI)</h2>
+    <p>من النماذج التنبؤية إلى الأنظمة التوليدية. يغطي هذا القسم تطور المعماريات التوليدية، بما في ذلك أجهزة التشفير التلقائي (Autoencoders)، وشبكات الخصومة التوليدية (GANs)، ونماذج الانتشار (Diffusion models)، والنماذج اللغوية الكبيرة (LLMs).</p>
+</div>
+
+<div class="topic-card accent-cyan">
+    <h3><span class="card-icon">🗜️</span> 1. أجهزة التشفير التلقائي (Autoencoders)</h3>
+    <p>يتعلم التشفير التلقائي ضغط البيانات إلى تمثيل منخفض الأبعاد (<strong>المساحة الكامنة - latent space</strong> أو <strong>عنق الزجاجة - bottleneck</strong>) ثم إعادة بنائها مرة أخرى إلى الشكل الأصلي.</p>
+    <ul>
+        <li><strong>المشفر (Encoder - $E(x)$):</strong> يضغط المدخلات في تمثيل عنق الزجاجة $z$.</li>
+        <li><strong>المفكك (Decoder - $D(z)$):</strong> يعيد بناء المدخلات الأصلية من $z$.</li>
+    </ul>
+    <div class="math-block"><span class="math-display">L = \\|x - D(E(x))\\|^2</span></div>
+    <div class="highlight-box info">
+        <div class="highlight-title">ارتباط بالتحليل</div>
+        <p>جهاز التشفير التلقائي الخطي مكافئ رياضياً لـ <strong>تحليل المكونات الرئيسية (PCA)</strong>. تقوم أجهزة التشفير التلقائي العميقة بتقليل الأبعاد غير الخطية.</p>
+    </div>
+    <p>تشمل المتغيرات أجهزة التشفير التلقائي لإزالة الضوضاء (denoising autoencoders - المدربة على إزالة الضوضاء)، وأجهزة التشفير التلقائي المتناثرة (sparse autoencoders)، وأجهزة التشفير التلقائي الانكماشية (contractive autoencoders).</p>
+</div>
+
+<div class="topic-card accent-purple">
+    <h3><span class="card-icon">🎲</span> 2. أجهزة التشفير التلقائي التغايرية (VAEs)</h3>
+    <p>بدلاً من تعيين إدخال إلى متجه ثابت، يقوم VAE بتعيين المدخلات إلى <strong>توزيع احتمالي</strong> في المساحة الكامنة. هذا يسمح بالاستيفاء السلس وتوليد عينات جديدة.</p>
+    <div class="math-block"><span class="math-display">L = L_{\\text{reconstruction}} + D_{\\text{KL}}(q(z|x) \\parallel p(z))</span></div>
+    <p>توازن خسارة الحد الأدنى للأدلة (ELBO) بين جودة إعادة البناء وتباعد KL (KL divergence)، مما يجبر التوزيع الكامن على أن يكون قريباً من التوزيع الطبيعي القياسي.</p>
+    <div class="highlight-box tip">
+        <div class="highlight-title">خدعة إعادة المعايرة (Reparameterization Trick)</div>
+        <p>للانتشار الخلفي عبر أخذ العينات العشوائية، تستخدم VAEs: <br> <span class="math-inline">z = \\mu + \\sigma \\odot \\epsilon</span>، حيث <span class="math-inline">\\epsilon \\sim \\mathcal{N}(0, I)</span>.</p>
+    </div>
+</div>
+
+<div class="topic-card accent-pink">
+    <h3><span class="card-icon">⚔️</span> 3. شبكات الخصومة التوليدية (GANs)</h3>
+    <p>تصيغ شبكات GAN النمذجة التوليدية كلعبة minimax بين شبكتين:</p>
+    <ul>
+        <li><strong>المولد (Generator - $G$):</strong> يحاول إنشاء بيانات مزيفة تبدو حقيقية.</li>
+        <li><strong>المميز (Discriminator - $D$):</strong> يحاول التمييز بين البيانات الحقيقية والبيانات المزيفة من $G$.</li>
+    </ul>
+    <div class="math-block"><span class="math-display">\\min_G \\max_D V(D, G) = \\mathbb{E}_{x}[\\log D(x)] + \\mathbb{E}_{z}[\\log(1 - D(G(z)))]</span></div>
+    <p><strong>انهيار الوضع (Mode Collapse):</strong> وضع فشل شائع حيث ينتج $G$ أنواعاً محدودة من المخرجات. يتم معالجته بواسطة معماريات مثل Wasserstein GANs وتقنيات مثل التسوية الطيفية (spectral normalization).</p>
+    <p><em>معماريات بارزة:</em> DCGAN, StyleGAN, CycleGAN.</p>
+</div>
+
+<div class="topic-card accent-emerald">
+    <h3><span class="card-icon">🌫️</span> 4. نماذج الانتشار (Diffusion Models)</h3>
+    <p>حلت نماذج الانتشار محل شبكات GAN إلى حد كبير لتوليد صور عالية الجودة (مثل Stable Diffusion و DALL-E و Midjourney).</p>
+    <ul>
+        <li><strong>العملية الأمامية (Forward Process):</strong> تضيف تدريجياً ضوضاء غاوسية (Gaussian noise) إلى البيانات عبر $T$ خطوات حتى تصبح ضوضاء نقية.</li>
+        <li><strong>العملية العكسية (Reverse Process):</strong> تتعلم شبكة عصبية (غالباً U-Net) إزالة الضوضاء من البيانات خطوة بخطوة.</li>
+    </ul>
+    <div class="highlight-box important">
+        <div class="highlight-title">لماذا تتفوق على شبكات GAN</div>
+        <p>توفر نماذج الانتشار تدريباً أكثر استقراراً وتغطية وضع أفضل (تنوع العينات المولدة) بكثير من شبكات GAN، على الرغم من أن التوليد عادةً ما يكون أبطأ بسبب عملية إزالة الضوضاء التسلسلية.</p>
+    </div>
+</div>
+
+<div class="topic-card accent-amber">
+    <h3><span class="card-icon">🦜</span> 5. النماذج اللغوية الكبيرة (LLMs)</h3>
+    <p>تعتمد النماذج اللغوية الكبيرة (LLMs) الحديثة في الغالب على معمارية Transformer، ويتم تدريبها على مجموعات بيانات ضخمة باستخدام <strong>التنبؤ بالرمز التالي (next-token prediction)</strong> ذاتي الانحدار.</p>
+    <ul>
+        <li><strong>الترميز (Tokenization):</strong> يتم تقسيم النص إلى كلمات فرعية (رموز) باستخدام خوارزميات مثل Byte-Pair Encoding (BPE) أو SentencePiece.</li>
+        <li><strong>قوانين القياس (Scaling Laws):</strong> يتحسن أداء النموذج بشكل متوقع مع زيادة الحوسبة، وحجم مجموعة البيانات، وعدد المعلمات.</li>
+        <li><strong>القدرات الناشئة (Emergent Abilities):</strong> عند نطاق كافٍ، تظهر النماذج اللغوية الكبيرة (LLMs) قدرات (zero-shot) و (few-shot) لم يتم تدريبها صراحةً عليها.</li>
+    </ul>
+    <p><strong>RLHF والمحاذاة:</strong> يتم استخدام التعلم المعزز من الملاحظات البشرية (Reinforcement Learning from Human Feedback) لمواءمة مخرجات النموذج مع التفضيلات البشرية وإرشادات السلامة.</p>
+</div>
+
+<div class="topic-card accent-blue">
+    <h3><span class="card-icon">🏗️</span> 6. النماذج متعددة الوسائط والأساسية (Multimodal & Foundation Models)</h3>
+    <p>تتضمن الحدود الحالية نماذج يمكنها معالجة وإنشاء عبر وسائط متعددة (نص، صور، صوت).</p>
+    <ul>
+        <li><strong>النماذج متعددة الوسائط (Multimodal Models):</strong> تشمل الأمثلة CLIP (أزواج نص-صورة متناقضة)، Flamingo، و GPT-4V.</li>
+        <li><strong>النماذج الأساسية (Foundation Models):</strong> نموذج التدريب المسبق لنموذج ضخم على بيانات متنوعة على نطاق واسع، والذي يمكن بعد ذلك ضبطه بدقة أو توجيهه لمجموعة متنوعة من المهام النهائية.</li>
+    </ul>
+</div>
+
+<div class="topic-card">
+    <h3><span class="card-icon">🎮</span> 7. عرض تفاعلي: المساحة الكامنة التوليدية (Generative Latent Space)</h3>
+    <p>انقر واسحب في المساحة الكامنة ثنائية الأبعاد على اليسار. تقوم الشبكة العصبية للمفكك بإنشاء نمط إجرائي على اليمين بناءً على إحداثيات $z$ المختارة. لاحظ كيف يتم استيفاء الإخراج بسلاسة وأنت تتحرك عبر المساحة الكامنة.</p>
+    <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+</div>
+
+<div class="key-takeaway">
+    <h4>أهم النقاط</h4>
+    <ul>
+        <li>تطور الذكاء الاصطناعي التوليدي من أجهزة التشفير التلقائي (Autoencoders) إلى VAEs و GANs ونماذج الانتشار (Diffusion models).</li>
+        <li>تعتمد النماذج اللغوية الكبيرة (LLMs) على التنبؤ بالرمز التالي الذي يتم قياسه إلى مجموعات بيانات ضخمة.</li>
+        <li>توفر نماذج الانتشار استقراراً أفضل في التدريب مقارنة بشبكات GAN.</li>
+        <li>تمثل النماذج الأساسية (تدريب مسبق + ضبط دقيق) النموذج الجديد لتطوير الذكاء الاصطناعي.</li>
+        <li>يتيح استكشاف المساحة الكامنة (Latent space) الاستيفاء والمعالجة الدلالية.</li>
+    </ul>
+</div>
+`,
         initDemo: function(container) {
 
 var latentCanvas = null;

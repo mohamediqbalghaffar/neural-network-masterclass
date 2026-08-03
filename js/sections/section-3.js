@@ -82,6 +82,83 @@
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="topic-card accent-cyan">
+                <h3><span class="card-icon">📈</span> دوال التنشيط</h3>
+                <p>تُدخل دوال التنشيط اللاخطية. بدونها، تعادل الشبكة العميقة رياضياً تحويلاً خطياً واحداً.</p>
+                
+                <div class="tabs">
+                    <div class="tab-nav" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button class="tab-btn active tag cyan">ReLU</button>
+                        <button class="tab-btn tag purple">Sigmoid</button>
+                        <button class="tab-btn tag pink">Tanh</button>
+                    </div>
+                    <div class="tab-panel active" style="padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                        <strong>وحدة الخطية المصححة (ReLU)</strong>
+                        <div class="math-block"><span class="math-display">f(x) = \\max(0, x)</span></div>
+                        <p>الخيار القياسي للطبقات المخفية الحديثة. تمنع تلاشي التدرجات لـ $x > 0$ ورخيصة حسابياً.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="topic-card accent-purple">
+                <h3><span class="card-icon">📉</span> مشكلة تلاشي التدرج</h3>
+                <p>تقوم Sigmoid و Tanh بضغط المدخلات في نطاق صغير. بالنسبة للمدخلات الكبيرة جداً أو الصغيرة جداً، تقترب مشتقاتها من الصفر. أثناء الانتشار الخلفي، تتكاثر هذه التدرجات الصغيرة عبر الطبقات، مما يتسبب في تلاشي التدرجات في الطبقات المبكرة بشكل أسي.</p>
+                <div class="highlight-box warning">
+                    <div class="highlight-title">لماذا لا نستخدم ReLU دائماً؟</div>
+                    <p>يمكن أن تعاني ReLU من "ReLU الميتة" حيث تخرج الخلايا العصبية صفراً لجميع المدخلات وتتوقف عن التحديث. المتغيرات مثل Leaky ReLU ($f(x) = \\max(\\alpha x, x)$) أو GELU تحل هذه المشكلة.</p>
+                </div>
+            </div>
+            
+            <div class="topic-card accent-amber">
+                <h3><span class="card-icon">🎯</span> دوال الخسارة</h3>
+                <p>تحدد دوال الخسارة مدى خطأ النموذج. يتوافق اختيار الخسارة مع الطبيعة الإحصائية لمتغيرك المستهدف.</p>
+                
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>نوع المهمة</th>
+                                <th>دالة الخسارة القياسية</th>
+                                <th>مكافئ التحليل</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>الانحدار (Regression)</td>
+                                <td>متوسط الخطأ التربيعي (MSE)</td>
+                                <td>انحدار OLS</td>
+                            </tr>
+                            <tr>
+                                <td>التصنيف الثنائي</td>
+                                <td>الإنتروبيا المتقاطعة الثنائية (BCE)</td>
+                                <td>الخسارة اللوغاريتمية / الاحتمالية القصوى</td>
+                            </tr>
+                            <tr>
+                                <td>متعدد الفئات</td>
+                                <td>الإنتروبيا المتقاطعة الفئوية</td>
+                                <td>اللوجستي متعدد الحدود</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h3>عرض تفاعلي: متخيل التنشيط</h3>
+                <p>راقب شكل دوال التنشيط الشائعة.</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+            
+            <div class="key-takeaway">
+                <h4>أهم النقاط</h4>
+                <ul>
+                    <li>ReLU هو الخيار الافتراضي للطبقات المخفية بسبب تدفق التدرج الأفضل.</li>
+                    <li>يجب أن تتطابق دوال الخسارة مع توزيع المخرجات (الإنتروبيا المتقاطعة للاحتمالات، MSE للقيم المستمرة).</li>
+                    <li>يضمن التآزر بين التنشيط النهائي ودالة الخسارة (مثل Softmax + Cross-Entropy) استقرار التدرجات.</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             const canvas = container.querySelector('canvas');
             if (!canvas) return;

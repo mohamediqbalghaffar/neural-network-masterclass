@@ -92,6 +92,93 @@ onnx.save(onnx_model, <span class="code-string">"model.onnx"</span>)</code></pre
                 </ul>
             </div>
         `,
+        contentAr: `
+            <div class="content-grid">
+                <div class="topic-card accent-cyan">
+                    <h3><span class="card-icon">🕵️</span> الذكاء الاصطناعي القابل للتفسير (XAI)</h3>
+                    <p>غالباً ما يُطلق على الشبكات العصبية اسم "الصناديق السوداء" (black boxes)، لكن تقنيات قابلية التفسير تساعد محترفي التحليلات على فهم <em>لماذا</em> اتخذ النموذج قراراً معيناً.</p>
+                    <ul>
+                        <li><strong>SHAP (تفسيرات شابلي الإضافية):</strong> يعتمد على نظرية اللعبة. يعين لكل ميزة قيمة أهمية لتنبؤ معين.
+                        <div class="math-block">
+                            <span class="math-display">\\phi_i = \\sum_{S \\subseteq N \\setminus \\{i\\}} \\frac{|S|!(|N|-|S|-1)!}{|N|!} [v(S \\cup \\{i\\}) - v(S)]</span>
+                        </div>
+                        </li>
+                        <li><strong>LIME:</strong> يقرب النموذج المعقد بنموذج خطي بسيط وقابل للتفسير محلياً حول التنبؤ.</li>
+                        <li><strong>Grad-CAM:</strong> يستخدم التدرجات المتدفقة إلى الطبقة التلافيفية النهائية لإنتاج خريطة توطين للصور.</li>
+                    </ul>
+                </div>
+
+                <div class="topic-card accent-purple">
+                    <h3><span class="card-icon">⚖️</span> التحيز والعدالة والأخلاق</h3>
+                    <p>تعمل نماذج الذكاء الاصطناعي على تضخيم التحيزات الموجودة في بيانات التدريب. بالنسبة لمحللي البيانات، من الأهمية بمكان تدقيق البيانات والنماذج.</p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>مصدر التحيز</th>
+                                <th>الوصف</th>
+                                <th>استراتيجية التخفيف</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>التحيز التاريخي</td>
+                                <td>تعكس البيانات الممارسات التمييزية السابقة.</td>
+                                <td>إعادة وزن البيانات، قيود العدالة الخوارزمية.</td>
+                            </tr>
+                            <tr>
+                                <td>تحيز التمثيل</td>
+                                <td>بعض المجموعات السكانية ممثلة تمثيلاً ناقصاً في البيانات.</td>
+                                <td>أخذ العينات الطبقية، توليد بيانات تركيبية (synthetic data).</td>
+                            </tr>
+                            <tr>
+                                <td>تحيز القياس</td>
+                                <td>الميزات أو التسميات مزعجة (noisy) أو وكلاء سيئون.</td>
+                                <td>تحسين هندسة الميزات وجمع التسميات.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="topic-card accent-emerald">
+                    <h3><span class="card-icon">📈</span> الشبكات العصبية في خطوط أنابيب التحليلات</h3>
+                    <p>كيف تتكامل الشبكات العصبية في تحليلات البيانات الكلاسيكية؟</p>
+                    <ul style="line-height: 1.6;">
+                        <li><strong>التضمينات (Embeddings):</strong> استخدم الشبكات العصبية المدربة مسبقاً لتحويل النص/البيانات الفئوية إلى متجهات كثيفة، ثم استخدم النماذج الكلاسيكية (مثل XGBoost) على تلك التضمينات.</li>
+                        <li><strong>اكتشاف الشذوذ (Anomaly Detection):</strong> استخدم أجهزة التشفير التلقائي (Autoencoders) على بيانات المعاملات؛ يشير فقدان إعادة البناء العالي إلى وجود شذوذ (احتيال).</li>
+                        <li><strong>أنظمة التوصية:</strong> معماريات ثنائية الأبراج تطابق تضمينات المستخدم مع تضمينات العناصر.</li>
+                    </ul>
+                    
+                    <div class="code-block">
+                        <div class="code-block-header">النشر: TensorFlow إلى ONNX</div>
+                        <pre><code><span class="code-keyword">import</span> tf2onnx
+<span class="code-keyword">import</span> onnx
+
+<span class="code-comment"># تحويل نموذج TF إلى ONNX للنشر الشامل</span>
+onnx_model, _ = tf2onnx.convert.from_keras(
+    model, 
+    input_signature, 
+    opset=<span class="code-number">13</span>
+)
+onnx.save(onnx_model, <span class="code-string">"model.onnx"</span>)</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="topic-card accent-amber" style="margin-top: 1.5rem;">
+                <h3><span class="card-icon">🎮</span> عرض تفاعلي: لوحة معلومات قابلية التفسير</h3>
+                <p>قم بتبديل الميزات (تشغيل/إيقاف) لترى كيف تؤثر على درجة التنبؤ النهائية، ومحاكاة مخطط أهمية ميزات SHAP.</p>
+                <p><em>(شاهد العرض المباشر بالأسفل)</em></p>
+            </div>
+
+            <div class="key-takeaway">
+                <h4>أهم النقاط</h4>
+                <ul>
+                    <li>يجب أن تكون نماذج التعلم العميق قابلة للتدقيق والتفسير عند نشرها في بيئات عالية المخاطر.</li>
+                    <li>المقاييس الفنية وحدها لا تضمن نموذجاً عادلاً؛ الخبرة في المجال والاعتبارات الأخلاقية مطلوبة.</li>
+                    <li>يتضمن الانتقال من بيئة التطوير (notebook) إلى الإنتاج التوحيد القياسي (ONNX) وبنية تحتية للخدمة قابلة للتطوير.</li>
+                </ul>
+            </div>
+        `,
         initDemo: function(container) {
             // Use the canvas generated by app.js in the container
             const canvas = container.querySelector('canvas');
