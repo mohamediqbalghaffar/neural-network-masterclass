@@ -131,23 +131,7 @@
             <div class="topic-card accent-pink">
                 <h3><span class="card-icon">🎮</span> Interactive Demo: Gradient Descent Terrain Walker</h3>
                 <p>Observe how different optimizers traverse a non-convex loss surface (Himmelblau's function). Notice how Adam escapes flat regions quickly while Momentum can overshoot minima.</p>
-                
-                <div class="demo-container">
-                    <div class="demo-controls" id="demo-controls-4">
-                        <label>Optimizer:
-                            <select id="optimizer-select">
-                                <option value="sgd">SGD</option>
-                                <option value="momentum">Momentum</option>
-                                <option value="adam" selected>Adam</option>
-                            </select>
-                        </label>
-                        <label>Learning Rate (η): <span id="lr-val">0.05</span>
-                            <input type="range" id="lr-slider" min="0.001" max="0.2" step="0.001" value="0.05">
-                        </label>
-                        <button id="reset-walker-btn" class="demo-btn">Reset Walker</button>
-                    </div>
-                    <canvas id="demo-canvas-4" width="900" height="450"></canvas>
-                </div>
+                <p><em>(See the live demo below)</em></p>
             </div>
 
             <div class="key-takeaway">
@@ -161,14 +145,32 @@
             </div>
         `,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-4');
+            const canvas = container.querySelector('canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            const optimizerSelect = document.getElementById('optimizer-select');
-            const lrSlider = document.getElementById('lr-slider');
-            const lrVal = document.getElementById('lr-val');
-            const resetBtn = document.getElementById('reset-walker-btn');
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'demo-controls';
+            controlsDiv.style.marginBottom = '15px';
+            controlsDiv.innerHTML = `
+                <label style="color:#fff; font-size:14px; margin-right:10px;">Optimizer:
+                    <select id="optimizer-select" style="background:#1A1A3E; color:#fff; border:1px solid #00CFFD; padding:4px 8px; border-radius:4px;">
+                        <option value="sgd">SGD</option>
+                        <option value="momentum">Momentum</option>
+                        <option value="adam" selected>Adam</option>
+                    </select>
+                </label>
+                <label style="color:#fff; font-size:14px; margin-right:10px;">Learning Rate (η): <span id="lr-val">0.05</span>
+                    <input type="range" id="lr-slider" min="0.001" max="0.2" step="0.001" value="0.05" style="vertical-align:middle;">
+                </label>
+                <button id="reset-walker-btn" class="demo-btn">Reset Walker</button>
+            `;
+            container.insertBefore(controlsDiv, container.querySelector('.demo-canvas-container'));
+            
+            const optimizerSelect = controlsDiv.querySelector('#optimizer-select');
+            const lrSlider = controlsDiv.querySelector('#lr-slider');
+            const lrVal = controlsDiv.querySelector('#lr-val');
+            const resetBtn = controlsDiv.querySelector('#reset-walker-btn');
             
             let reqId;
             let lr = parseFloat(lrSlider.value);

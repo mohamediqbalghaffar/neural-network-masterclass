@@ -1,0 +1,1 @@
+const fs = require('fs'); for(let i=1; i<=10; i++) { try { const data = fs.readFileSync('js/sections/section-' + i + '.js', 'utf8'); if (data.includes('id=\"demo-canvas')) console.log('Section ' + i + ' has duplicate canvas!'); } catch(e){} }

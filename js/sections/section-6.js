@@ -111,14 +111,7 @@ model.add(tf.layers.dense({units: <span class="code-number">10</span>, activatio
             <div class="topic-card accent-cyan">
                 <h3><span class="card-icon">🎮</span> Interactive Demo: CNN Filter Visualization</h3>
                 <p>Select a kernel filter. The demo animates how the filter slides over the 6x6 input image (left) to produce a 4x4 feature map (right) without padding ($S=1, P=0$).</p>
-                
-                <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem; justify-content: center;" id="demo-controls-6">
-                    <button class="tab-btn active" id="btn-edge">Edge Detection</button>
-                    <button class="tab-btn" id="btn-blur">Blur</button>
-                    <button class="tab-btn" id="btn-sharpen">Sharpen</button>
-                </div>
-                
-                <canvas id="demo-canvas-6" width="900" height="450" style="width:100%; border-radius: 8px; background: #080818;"></canvas>
+                <p><em>(See the live demo below)</em></p>
             </div>
 
             <div class="key-takeaway">
@@ -131,9 +124,21 @@ model.add(tf.layers.dense({units: <span class="code-number">10</span>, activatio
             </div>
         `,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-6');
+            const canvas = container.querySelector('canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
+            
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'demo-controls';
+            controlsDiv.style.marginBottom = '15px';
+            controlsDiv.style.justifyContent = 'center';
+            controlsDiv.innerHTML = `
+                <button class="demo-btn active" id="btn-edge">Edge Detection</button>
+                <button class="demo-btn" id="btn-blur">Blur</button>
+                <button class="demo-btn" id="btn-sharpen">Sharpen</button>
+            `;
+            container.insertBefore(controlsDiv, container.querySelector('.demo-canvas-container'));
+            
             let animationId;
 
             // Define filters
@@ -186,10 +191,10 @@ model.add(tf.layers.dense({units: <span class="code-number">10</span>, activatio
 
             // Button handlers
             ['edge', 'blur', 'sharpen'].forEach(type => {
-                const btn = document.getElementById(`btn-${type}`);
+                const btn = controlsDiv.querySelector(`#btn-${type}`);
                 if (btn) {
                     btn.addEventListener('click', () => {
-                        document.querySelectorAll('#demo-controls-6 .tab-btn').forEach(b => b.classList.remove('active'));
+                        controlsDiv.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
                         currentFilter = type;
                         computeOutput();

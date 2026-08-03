@@ -70,7 +70,7 @@
             <div class="topic-card">
                 <h3>Interactive Demo: Activation Visualizer</h3>
                 <p>Observe the shape of common activation functions.</p>
-                <canvas id="demo-canvas-3" width="900" height="450" style="background: #080818; border-radius: 8px;"></canvas>
+                <p><em>(See the live demo below)</em></p>
             </div>
             
             <div class="key-takeaway">
@@ -83,7 +83,7 @@
             </div>
         `,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-3');
+            const canvas = container.querySelector('canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             

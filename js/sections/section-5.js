@@ -112,22 +112,7 @@
             <div class="topic-card accent-purple">
                 <h3><span class="card-icon">📈</span> Interactive Demo: Overfitting Simulator</h3>
                 <p>Watch how training and validation loss curves evolve over epochs. Tweak model complexity and add regularization (Dropout, L2 Weight Decay) to observe how you can close the generalization gap.</p>
-                
-                <div class="demo-container">
-                    <div class="demo-controls" id="demo-controls-5">
-                        <label>Model Complexity: <span id="complexity-val">Medium</span>
-                            <input type="range" id="complexity-slider" min="1" max="10" step="1" value="5">
-                        </label>
-                        <label>
-                            <input type="checkbox" id="dropout-toggle"> Enable Dropout (p=0.5)
-                        </label>
-                        <label>
-                            <input type="checkbox" id="l2-toggle"> Enable L2 Reg (λ=1e-4)
-                        </label>
-                        <button id="retrain-btn" class="demo-btn">Retrain Model</button>
-                    </div>
-                    <canvas id="demo-canvas-5" width="900" height="450"></canvas>
-                </div>
+                <p><em>(See the live demo below)</em></p>
             </div>
 
             <div class="key-takeaway">
@@ -140,15 +125,32 @@
             </div>
         `,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-5');
+            const canvas = container.querySelector('canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             
-            const complexitySlider = document.getElementById('complexity-slider');
-            const complexityVal = document.getElementById('complexity-val');
-            const dropoutToggle = document.getElementById('dropout-toggle');
-            const l2Toggle = document.getElementById('l2-toggle');
-            const retrainBtn = document.getElementById('retrain-btn');
+            const controlsDiv = document.createElement('div');
+            controlsDiv.className = 'demo-controls';
+            controlsDiv.style.marginBottom = '15px';
+            controlsDiv.innerHTML = `
+                <label style="color:#fff; font-size:14px; margin-right:10px;">Model Complexity: <span id="complexity-val">Medium</span>
+                    <input type="range" id="complexity-slider" min="1" max="10" step="1" value="5" style="vertical-align:middle; width:100px;">
+                </label>
+                <label style="color:#fff; font-size:14px; margin-right:10px;">
+                    <input type="checkbox" id="dropout-toggle" style="vertical-align:middle;"> Enable Dropout (p=0.5)
+                </label>
+                <label style="color:#fff; font-size:14px; margin-right:10px;">
+                    <input type="checkbox" id="l2-toggle" style="vertical-align:middle;"> Enable L2 Reg (λ=1e-4)
+                </label>
+                <button id="retrain-btn" class="demo-btn">Retrain Model</button>
+            `;
+            container.insertBefore(controlsDiv, container.querySelector('.demo-canvas-container'));
+            
+            const complexitySlider = controlsDiv.querySelector('#complexity-slider');
+            const complexityVal = controlsDiv.querySelector('#complexity-val');
+            const dropoutToggle = controlsDiv.querySelector('#dropout-toggle');
+            const l2Toggle = controlsDiv.querySelector('#l2-toggle');
+            const retrainBtn = controlsDiv.querySelector('#retrain-btn');
             
             let reqId;
             let epoch = 0;

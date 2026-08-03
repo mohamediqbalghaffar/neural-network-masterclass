@@ -82,7 +82,7 @@
             <div class="topic-card accent-cyan">
                 <h3><span class="card-icon">🎮</span> Interactive Demo: Unrolled RNN Over Time</h3>
                 <p>Watch how the hidden state updates at each time step as the network processes the sequence "DATA". The color intensity indicates the magnitude of the hidden state vector.</p>
-                <canvas id="demo-canvas-7" width="900" height="350" style="width:100%; border-radius: 8px; background: #080818; margin-top: 1rem;"></canvas>
+                <p><em>(See the live demo below)</em></p>
             </div>
 
             <div class="key-takeaway">
@@ -95,7 +95,7 @@
             </div>
         `,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-7');
+            const canvas = container.querySelector('canvas');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let animationId;
