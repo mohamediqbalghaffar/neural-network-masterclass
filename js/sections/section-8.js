@@ -1,247 +1,225 @@
 (function() {
     'use strict';
-
     NeuralApp.registerSection({
         id: 8,
         title: "Transformers & Attention",
-        icon: "🤖",
-        content: `
-            <div class="content-grid">
-                <div class="topic-card accent-cyan">
-                    <h3><span class="card-icon">🎯</span> Self-Attention Mechanism</h3>
-                    <p>The core of the Transformer architecture is the <strong>Self-Attention</strong> mechanism. Unlike RNNs that process sequences step-by-step, attention computes a weighted sum of all sequence elements simultaneously, allowing it to capture long-range dependencies effectively.</p>
-                    <p>We compute three vectors for each input: <strong>Query (Q)</strong>, <strong>Key (K)</strong>, and <strong>Value (V)</strong>.</p>
-                    
-                    <div class="math-block">
-                        <span class="math-display">\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{Q K^T}{\\sqrt{d_k}}\\right) V</span>
-                    </div>
-                    
-                    <div class="collapsible">
-                        <button class="collapsible-trigger">Why scale by \\(\\sqrt{d_k}\\)? <span class="chevron">▼</span></button>
-                        <div class="collapsible-content">
-                            <div class="collapsible-content-inner">
-                                <p>When the dimensionality \\(d_k\\) is large, the dot products \\(Q K^T\\) grow large in magnitude, pushing the softmax function into regions where it has extremely small gradients. Scaling by \\(\\sqrt{d_k}\\) counteracts this effect, keeping the variance of the dot products around 1.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        icon: "🧠",
+        content: `<div class="section-intro">
+    <p>The Transformer architecture, introduced in "Attention Is All You Need", fundamentally shifted the paradigm from recurrent networks to attention mechanisms, unlocking unprecedented scale in deep learning.</p>
+</div>
 
-                <div class="topic-card accent-purple">
-                    <h3><span class="card-icon">🔀</span> Multi-Head Attention</h3>
-                    <p>Instead of performing a single attention function, Transformers use <strong>Multi-Head Attention</strong> to jointly attend to information from different representation subspaces at different positions.</p>
-                    <div class="math-block">
-                        <span class="math-display">\\text{MultiHead}(Q, K, V) = \\text{Concat}(\\text{head}_1, \\dots, \\text{head}_h)W^O</span>
-                    </div>
-                    <p>Where each head is:</p>
-                    <div class="math-block">
-                        <span class="math-display">\\text{head}_i = \\text{Attention}(QW_i^Q, KW_i^K, VW_i^V)</span>
-                    </div>
-                </div>
+<div class="topic-card accent-cyan">
+    <h3><span class="card-icon">🔍</span> 1. Self-Attention Mechanism</h3>
+    <p>Self-attention allows the model to weigh the importance of different tokens in the input sequence when encoding a specific token.</p>
+    <p>For each token, we compute three vectors from its embedding: <strong>Query (Q)</strong>, <strong>Key (K)</strong>, and <strong>Value (V)</strong>.</p>
+    <div class="math-block"><span class="math-display">Attention(Q, K, V) = softmax\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right) V</span></div>
+    <p>Why scale by $\\sqrt{d_k}$? Without it, dot products grow large in high dimensions, pushing the softmax function into regions with very small gradients (saturation).</p>
+    <div class="highlight-box info">
+        <div class="highlight-title">Analytics Connection</div>
+        <p>Self-attention is like a dynamic similarity matrix. Each token "queries" all other tokens (keys) to determine how much of their "value" to incorporate.</p>
+    </div>
+</div>
 
-                <div class="topic-card accent-pink">
-                    <h3><span class="card-icon">📍</span> Positional Encoding</h3>
-                    <p>Since Transformers don't have built-in recurrence or convolution, they have no notion of token order. <strong>Positional encodings</strong> are injected into the input embeddings to provide relative or absolute position information.</p>
-                    <p>Original Sinusoidal Encoding:</p>
-                    <div class="math-block">
-                        <span class="math-display">PE_{(pos, 2i)} = \\sin(pos / 10000^{2i/d_{\\text{model}}})</span>
-                    </div>
-                    <div class="math-block">
-                        <span class="math-display">PE_{(pos, 2i+1)} = \\cos(pos / 10000^{2i/d_{\\text{model}}})</span>
-                    </div>
-                </div>
+<div class="topic-card accent-purple">
+    <h3><span class="card-icon">🧠</span> 2. Multi-Head Attention</h3>
+    <p>Instead of computing a single attention pass, transformers compute multiple independent attention "heads" in parallel.</p>
+    <div class="math-block"><span class="math-display">MultiHead = Concat(head_1, ..., head_h) W^O</span></div>
+    <p>where each head is computed as:</p>
+    <div class="math-block"><span class="math-display">head_i = Attention(Q W_i^Q, K W_i^K, V W_i^V)</span></div>
+    <p>This allows the model to jointly attend to information from different representation subspaces at different positions. For example, one head might focus on syntax, another on semantics, and another on positional relationships.</p>
+</div>
 
-                <div class="topic-card accent-emerald">
-                    <h3><span class="card-icon">🏗️</span> The Transformer Architecture</h3>
-                    <p>The full architecture consists of an Encoder and a Decoder.</p>
-                    <ul>
-                        <li><strong>Encoder:</strong> Self-Attention → Feed-Forward (with residual connections and layer normalization).</li>
-                        <li><strong>Decoder:</strong> Masked Self-Attention → Encoder-Decoder Attention → Feed-Forward.</li>
-                    </ul>
-                    
-                    <div class="highlight-box info">
-                        <div class="highlight-title">Analytics Connection: Graph Operations</div>
-                        <p>Self-attention can be viewed as routing information over a complete graph where edges are dynamically weighted by the similarity (dot product) between node representations. This is highly related to graph analytics and similarity matrix operations.</p>
-                    </div>
-                </div>
-            </div>
+<div class="topic-card accent-pink">
+    <h3><span class="card-icon">📍</span> 3. Positional Encoding</h3>
+    <p>Unlike RNNs, transformers process tokens in parallel and have no built-in notion of order. To inject sequence order, we add positional encodings to the input embeddings.</p>
+    <div class="math-block"><span class="math-display">PE_{(pos, 2i)} = \\sin(pos / 10000^{2i/d_{model}})</span></div>
+    <div class="math-block"><span class="math-display">PE_{(pos, 2i+1)} = \\cos(pos / 10000^{2i/d_{model}})</span></div>
+    <p>Modern variants often use learned positional embeddings or Rotary Position Embedding (RoPE), which injects relative positional information directly into the attention mechanism.</p>
+</div>
 
-            <div class="topic-card accent-amber" style="margin-top: 1.5rem;">
-                <h3><span class="card-icon">📊</span> BERT vs GPT vs ViT</h3>
-                
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Model Family</th>
-                            <th>Architecture</th>
-                            <th>Objective</th>
-                            <th>Use Case</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>BERT</strong> (Google)</td>
-                            <td>Encoder-only</td>
-                            <td>Masked Language Modeling (MLM)</td>
-                            <td>Text classification, NER, embedding extraction</td>
-                        </tr>
-                        <tr>
-                            <td><strong>GPT</strong> (OpenAI)</td>
-                            <td>Decoder-only</td>
-                            <td>Causal / Next-token Prediction</td>
-                            <td>Text generation, dialogue, coding</td>
-                        </tr>
-                        <tr>
-                            <td><strong>ViT</strong> (Vision)</td>
-                            <td>Encoder-only</td>
-                            <td>Image patch classification</td>
-                            <td>Image classification, object detection</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<div class="topic-card accent-emerald">
+    <h3><span class="card-icon">🏗️</span> 4. The Full Transformer Architecture</h3>
+    <p>The original transformer consists of an encoder-decoder structure.</p>
+    <ul>
+        <li><strong>Encoder:</strong> Repeated blocks of Self-Attention $\\rightarrow$ Add & Norm $\\rightarrow$ Feed-Forward $\\rightarrow$ Add & Norm.</li>
+        <li><strong>Decoder:</strong> Masked Self-Attention $\\rightarrow$ Cross-Attention (to encoder outputs) $\\rightarrow$ Feed-Forward.</li>
+    </ul>
+    <p>Layer Normalization and Residual (Skip) Connections stabilize training in deep networks by providing direct gradient paths.</p>
+    <div class="highlight-box info">
+        <div class="highlight-title">Analytics Connection</div>
+        <p>Residual connections are analogous to ensemble averaging — they allow the network to incrementally refine representations without losing the original signal.</p>
+    </div>
+</div>
 
-            <div class="topic-card accent-cyan" style="margin-top: 1.5rem;">
-                <h3><span class="card-icon">🎮</span> Interactive Demo: Attention Heatmap</h3>
-                <p>Click on words in the sentence to see how the Self-Attention mechanism assigns weight to other words.</p>
-                <div class="demo-container" style="position: relative; width: 100%; height: 450px; background: #080818; border-radius: 8px; overflow: hidden; margin-top: 1rem;">
-                    <canvas id="demo-canvas-8" width="900" height="450" style="display: block; width: 100%; height: 100%;"></canvas>
-                    <div id="demo-controls-8" style="position: absolute; bottom: 10px; left: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
-                </div>
-            </div>
+<div class="topic-card accent-amber">
+    <h3><span class="card-icon">🔄</span> 5. BERT vs GPT vs T5 vs ViT</h3>
+    <div class="comparison-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Architecture</th>
+                    <th>Training Objective</th>
+                    <th>Typical Use Cases</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>BERT</strong></td>
+                    <td>Encoder-only</td>
+                    <td>Masked Language Modeling (MLM)</td>
+                    <td>Text classification, NER, QA</td>
+                </tr>
+                <tr>
+                    <td><strong>GPT</strong></td>
+                    <td>Decoder-only</td>
+                    <td>Causal Language Modeling</td>
+                    <td>Text generation, Chatbots</td>
+                </tr>
+                <tr>
+                    <td><strong>T5</strong></td>
+                    <td>Encoder-Decoder</td>
+                    <td>Span Corruption (Text-to-Text)</td>
+                    <td>Translation, Summarization</td>
+                </tr>
+                <tr>
+                    <td><strong>ViT</strong></td>
+                    <td>Encoder-only</td>
+                    <td>Supervised (Image Patches)</td>
+                    <td>Image classification</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-            <div class="key-takeaway">
-                <h4>Key Takeaways</h4>
-                <ul>
-                    <li>Attention routes information dynamically based on content similarity rather than strict sequential processing.</li>
-                    <li>The \\(\\mathcal{O}(N^2)\\) complexity of attention is its main bottleneck for long sequences.</li>
-                    <li>The Transformer has become the universal architecture spanning text, vision, and audio.</li>
-                </ul>
-            </div>
-        `,
+<div class="topic-card accent-blue">
+    <h3><span class="card-icon">⚡</span> 6. Attention Complexity & Efficient Transformers</h3>
+    <p>The standard attention mechanism computes pairwise interactions between all tokens, resulting in $O(N^2)$ memory and time complexity where $N$ is sequence length.</p>
+    <ul>
+        <li><strong>Hardware Optimization:</strong> Flash Attention optimizes GPU memory reads/writes to compute exact attention much faster.</li>
+        <li><strong>Approximations:</strong> Sparse attention and linear attention reduce complexity to $O(N)$ or $O(N \\log N)$.</li>
+        <li><strong>Context Extensions:</strong> Techniques like sliding windows or ALiBi allow processing sequences beyond the training context limit.</li>
+    </ul>
+</div>
+
+<div class="topic-card">
+    <h3><span class="card-icon">🎛️</span> 7. Interactive Demo: Attention Heatmap</h3>
+    <p>Click on words in the source sentence to see how much attention they pay to other words in the sequence. Thicker, more opaque lines indicate higher attention weights.</p>
+    <p><em>(See the live demo below)</em></p>
+</div>
+
+<div class="key-takeaway">
+    <h4>Key Takeaways</h4>
+    <ul>
+        <li>Attention routes information dynamically based on content similarity.</li>
+        <li>Multi-head attention captures different relationship types simultaneously.</li>
+        <li>The Transformer has become the universal architecture for text, vision, and audio.</li>
+        <li>$O(N^2)$ complexity is the main bottleneck; efficient attention methods are active research.</li>
+        <li>Positional encoding injects sequence order into an otherwise permutation-invariant architecture.</li>
+    </ul>
+</div>`,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-8');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let animationId;
-            let time = 0;
+        var words = ['The', 'cat', 'sat', 'on', 'the', 'mat'];
+        var attentionMatrix = [
+            [0.90, 0.05, 0.01, 0.01, 0.02, 0.01],
+            [0.05, 0.85, 0.05, 0.01, 0.02, 0.02],
+            [0.02, 0.10, 0.70, 0.08, 0.02, 0.08],
+            [0.01, 0.02, 0.05, 0.85, 0.02, 0.05],
+            [0.02, 0.02, 0.02, 0.02, 0.80, 0.12],
+            [0.01, 0.05, 0.15, 0.10, 0.09, 0.60]
+        ];
+        var selectedWordIndex = 2;
+        var animationId;
 
-            const sentence = ["The", "cat", "sat", "on", "the", "mat"];
-            // Dummy attention matrix (symmetric for illustration)
-            const attentionMatrix = [
-                [0.9, 0.1, 0.0, 0.0, 0.0, 0.0],
-                [0.1, 0.5, 0.3, 0.0, 0.0, 0.1],
-                [0.0, 0.3, 0.5, 0.1, 0.0, 0.1],
-                [0.0, 0.0, 0.1, 0.6, 0.2, 0.1],
-                [0.0, 0.0, 0.0, 0.2, 0.4, 0.4],
-                [0.0, 0.1, 0.1, 0.1, 0.4, 0.3],
-            ];
+        var canvas = document.createElement('canvas');
+        canvas.width = container.clientWidth || 800;
+        canvas.height = 400;
+        container.appendChild(canvas);
+        var ctx = canvas.getContext('2d');
 
-            let selectedWordIdx = 1; // Default "cat"
-            const wordBoxes = [];
-
-            // Calculate layout
-            const padding = 50;
-            const width = canvas.width;
-            const height = canvas.height;
-            const wordWidth = (width - 2 * padding) / sentence.length;
-
-            sentence.forEach((word, i) => {
-                wordBoxes.push({
-                    word,
-                    x: padding + i * wordWidth,
-                    y: height / 4,
-                    w: wordWidth - 10,
-                    h: 40
-                });
-            });
-
-            // Handle clicks
-            const handleCanvasClick = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-                for (let i = 0; i < wordBoxes.length; i++) {
-                    const b = wordBoxes[i];
-                    if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
-                        selectedWordIdx = i;
-                        break;
-                    }
-                }
-            };
-            canvas.addEventListener('click', handleCanvasClick);
-            this._cleanupClick = () => canvas.removeEventListener('click', handleCanvasClick);
-
-            function draw() {
-                ctx.clearRect(0, 0, width, height);
-                time += 0.02;
-
-                // Draw heatmaps (lines from selected word)
-                const sourceBox = wordBoxes[selectedWordIdx];
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            var wordBoxWidth = 60;
+            var wordBoxHeight = 30;
+            var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
+            
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            for (var i = 0; i < words.length; i++) {
+                var x = spacing + i * (wordBoxWidth + spacing);
+                var yTop = 50;
                 
-                // Lines to targets
-                for (let i = 0; i < sentence.length; i++) {
-                    const targetBox = wordBoxes[i];
-                    const weight = attentionMatrix[selectedWordIdx][i];
-                    
-                    if (weight > 0) {
-                        ctx.beginPath();
-                        ctx.moveTo(sourceBox.x + sourceBox.w/2, sourceBox.y + sourceBox.h);
-                        
-                        const cp1x = sourceBox.x + sourceBox.w/2;
-                        const cp1y = sourceBox.y + sourceBox.h + 100;
-                        const cp2x = targetBox.x + targetBox.w/2;
-                        const cp2y = height * 0.7 - 100;
-                        
-                        ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, targetBox.x + targetBox.w/2, height * 0.7);
-                        
-                        // Pulse effect based on weight
-                        const alpha = weight * (0.5 + 0.5 * Math.sin(time * 3 + i));
-                        ctx.strokeStyle = \`rgba(0, 207, 253, \${alpha})\`;
-                        ctx.lineWidth = weight * 10;
-                        ctx.stroke();
-                        
-                        // Draw target box
-                        ctx.fillStyle = \`rgba(0, 207, 253, \${weight * 0.5})\`;
-                        ctx.fillRect(targetBox.x, height * 0.7 - 20, targetBox.w, 40);
-                        
-                        ctx.fillStyle = '#E2E8F0';
-                        ctx.font = '16px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(sentence[i], targetBox.x + targetBox.w/2, height * 0.7 + 6);
-                        
-                        // Weight text
-                        ctx.fillStyle = '#A855F7';
-                        ctx.fillText(weight.toFixed(2), targetBox.x + targetBox.w/2, height * 0.7 + 40);
-                    }
-                }
-
-                // Draw source words
-                for (let i = 0; i < wordBoxes.length; i++) {
-                    const b = wordBoxes[i];
-                    const isSelected = i === selectedWordIdx;
-                    
-                    ctx.fillStyle = isSelected ? 'rgba(168, 85, 247, 0.4)' : 'rgba(100, 116, 139, 0.2)';
-                    ctx.strokeStyle = isSelected ? '#A855F7' : '#64748B';
-                    ctx.lineWidth = 2;
-                    ctx.fillRect(b.x, b.y, b.w, b.h);
-                    ctx.strokeRect(b.x, b.y, b.w, b.h);
-                    
-                    ctx.fillStyle = isSelected ? '#FFFFFF' : '#E2E8F0';
-                    ctx.font = '18px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(b.word, b.x + b.w/2, b.y + 26);
-                }
-
-                animationId = requestAnimationFrame(draw);
+                ctx.fillStyle = i === selectedWordIndex ? '#0ea5e9' : '#334155';
+                ctx.fillRect(x, yTop, wordBoxWidth, wordBoxHeight);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(words[i], x + wordBoxWidth/2, yTop + wordBoxHeight/2);
+                
+                var yBottom = canvas.height - 80;
+                ctx.fillStyle = '#334155';
+                ctx.fillRect(x, yBottom, wordBoxWidth, wordBoxHeight);
+                ctx.fillStyle = '#fff';
+                ctx.fillText(words[i], x + wordBoxWidth/2, yBottom + wordBoxHeight/2);
             }
             
-            draw();
-            this._animationId = animationId;
+            var srcX = spacing + selectedWordIndex * (wordBoxWidth + spacing) + wordBoxWidth/2;
+            var srcY = 50 + wordBoxHeight;
+            
+            for (var j = 0; j < words.length; j++) {
+                var weight = attentionMatrix[selectedWordIndex][j];
+                var destX = spacing + j * (wordBoxWidth + spacing) + wordBoxWidth/2;
+                var destY = canvas.height - 80;
+                
+                ctx.beginPath();
+                ctx.moveTo(srcX, srcY);
+                ctx.bezierCurveTo(srcX, srcY + 100, destX, destY - 100, destX, destY);
+                
+                var alpha = weight;
+                ctx.strokeStyle = 'rgba(14, 165, 233, ' + alpha + ')';
+                ctx.lineWidth = Math.max(1, weight * 10);
+                ctx.stroke();
+            }
+            
+            ctx.fillStyle = '#64748b';
+            ctx.font = '14px sans-serif';
+            ctx.fillText('Click a word on the top row to see its attention weights to other words', canvas.width / 2, 20);
+            
+            animationId = requestAnimationFrame(draw);
+        }
+
+        draw();
+
+        canvas.addEventListener('click', function(e) {
+            var rect = canvas.getBoundingClientRect();
+            var mouseX = e.clientX - rect.left;
+            var mouseY = e.clientY - rect.top;
+            
+            var wordBoxWidth = 60;
+            var wordBoxHeight = 30;
+            var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
+            
+            for (var i = 0; i < words.length; i++) {
+                var x = spacing + i * (wordBoxWidth + spacing);
+                var yTop = 50;
+                
+                if (mouseX >= x && mouseX <= x + wordBoxWidth && mouseY >= yTop && mouseY <= yTop + wordBoxHeight) {
+                    selectedWordIndex = i;
+                    break;
+                }
+            }
+        });
+
+        container.demoContext = {
+            animationId: animationId
+        };
         },
-        destroyDemo: function() {
-            if (this._animationId) cancelAnimationFrame(this._animationId);
-            if (this._cleanupClick) this._cleanupClick();
+        destroyDemo: function(container) {
+        if (container.demoContext && container.demoContext.animationId) {
+            cancelAnimationFrame(container.demoContext.animationId);
+        }
         }
     });
 })();

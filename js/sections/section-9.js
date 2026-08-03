@@ -1,208 +1,303 @@
 (function() {
     'use strict';
-
+    
     NeuralApp.registerSection({
         id: 9,
         title: "Generative Models & Modern AI",
-        icon: "🎨",
+        icon: "✨",
         content: `
-            <div class="content-grid">
-                <div class="topic-card accent-cyan">
-                    <h3><span class="card-icon">🗜️</span> Autoencoders</h3>
-                    <p>Autoencoders are neural networks designed to learn efficient representations of data by compressing it to a lower-dimensional <strong>bottleneck</strong> and then reconstructing it.</p>
-                    <p>They consist of an <strong>Encoder</strong> \\(E(x)\\) and a <strong>Decoder</strong> \\(D(z)\\). The loss is typically the Mean Squared Error of reconstruction.</p>
-                    <div class="math-block">
-                        <span class="math-display">\\mathcal{L} = ||x - D(E(x))||^2</span>
-                    </div>
-                    
-                    <div class="highlight-box info">
-                        <div class="highlight-title">Analytics Connection: Non-linear PCA</div>
-                        <p>A linear autoencoder spanning a \\(k\\)-dimensional subspace learns the exact same span as Principal Component Analysis (PCA). Deep autoencoders are effectively powerful, non-linear versions of PCA used for advanced dimensionality reduction and feature extraction.</p>
-                    </div>
-                </div>
+<div class="section-intro">
+    <h2>Generative Models &amp; Modern AI</h2>
+    <p>From predictive models to generative systems. This section covers the evolution of generative architectures, including Autoencoders, GANs, Diffusion models, and Large Language Models (LLMs).</p>
+</div>
 
-                <div class="topic-card accent-purple">
-                    <h3><span class="card-icon">🎲</span> Variational Autoencoders (VAEs)</h3>
-                    <p>Instead of mapping inputs to fixed vectors, VAEs map inputs to a <strong>probability distribution</strong> in the latent space. This regularizes the latent space and enables sampling of novel data.</p>
-                    <div class="math-block">
-                        <span class="math-display">\\mathcal{L}_{\\text{VAE}} = \\text{Reconstruction Loss} + D_{KL}(q_\\phi(z|x) || p(z))</span>
-                    </div>
-                    <p>The <strong>Reparameterization Trick</strong> is crucial here, allowing gradients to flow through the stochastic sampling process: \\(z = \\mu + \\sigma \\odot \\epsilon\\), where \\(\\epsilon \\sim \\mathcal{N}(0, I)\\).</p>
-                </div>
+<div class="topic-card accent-cyan">
+    <h3><span class="card-icon">🗜️</span> 1. Autoencoders</h3>
+    <p>An Autoencoder learns to compress data into a lower-dimensional representation (the <strong>latent space</strong> or <strong>bottleneck</strong>) and then reconstruct it back to the original form.</p>
+    <ul>
+        <li><strong>Encoder $E(x)$:</strong> Compresses input into a bottleneck representation $z$.</li>
+        <li><strong>Decoder $D(z)$:</strong> Reconstructs the original input from $z$.</li>
+    </ul>
+    <div class="math-block"><span class="math-display">L = \|x - D(E(x))\|^2</span></div>
+    <div class="highlight-box info">
+        <div class="highlight-title">Analytics Connection</div>
+        <p>A linear autoencoder is mathematically equivalent to <strong>Principal Component Analysis (PCA)</strong>. Deep autoencoders perform non-linear dimensionality reduction.</p>
+    </div>
+    <p>Variants include denoising autoencoders (trained to remove noise), sparse autoencoders, and contractive autoencoders.</p>
+</div>
 
-                <div class="topic-card accent-pink">
-                    <h3><span class="card-icon">⚔️</span> GANs</h3>
-                    <p><strong>Generative Adversarial Networks (GANs)</strong> use two networks pitted against each other: a <strong>Generator (G)</strong> trying to create realistic data, and a <strong>Discriminator (D)</strong> trying to distinguish real data from fakes.</p>
-                    <div class="math-block">
-                        <span class="math-display">\\min_G \\max_D V(D, G) = \\mathbb{E}_{x}[\\log D(x)] + \\mathbb{E}_{z}[\\log(1 - D(G(z)))]</span>
-                    </div>
-                    <p>A common issue is <em>mode collapse</em>, where the Generator finds a single output that fools the Discriminator and stops generating diverse samples.</p>
-                </div>
+<div class="topic-card accent-purple">
+    <h3><span class="card-icon">🎲</span> 2. Variational Autoencoders (VAEs)</h3>
+    <p>Instead of mapping an input to a fixed vector, a VAE maps inputs to a <strong>probability distribution</strong> in the latent space. This allows for smooth interpolation and generation of new samples.</p>
+    <div class="math-block"><span class="math-display">L = L_{\text{reconstruction}} + D_{\text{KL}}(q(z|x) \parallel p(z))</span></div>
+    <p>The Evidence Lower Bound (ELBO) loss balances reconstruction quality with the KL divergence, which forces the latent distribution to be close to a standard normal distribution.</p>
+    <div class="highlight-box tip">
+        <div class="highlight-title">The Reparameterization Trick</div>
+        <p>To backpropagate through random sampling, VAEs use: <br> <span class="math-inline">z = \mu + \sigma \odot \epsilon</span>, where <span class="math-inline">\epsilon \sim \mathcal{N}(0, I)</span>.</p>
+    </div>
+</div>
 
-                <div class="topic-card accent-emerald">
-                    <h3><span class="card-icon">🌫️</span> Diffusion Models</h3>
-                    <p>Diffusion models iteratively destroy data by adding noise (Forward Process), then train a neural network to reverse this process by predicting and removing the noise step-by-step (Reverse Process).</p>
-                    <div class="math-block">
-                        <span class="math-display">\\text{Forward: } q(x_t | x_{t-1}) = \\mathcal{N}(x_t; \\sqrt{1-\\beta_t}x_{t-1}, \\beta_t I)</span>
-                    </div>
-                    <p>Diffusion models (like Stable Diffusion) offer better training stability than GANs and higher generation quality than VAEs.</p>
-                </div>
-            </div>
+<div class="topic-card accent-pink">
+    <h3><span class="card-icon">⚔️</span> 3. Generative Adversarial Networks (GANs)</h3>
+    <p>GANs cast generative modeling as a minimax game between two networks:</p>
+    <ul>
+        <li><strong>Generator ($G$):</strong> Tries to create fake data that looks real.</li>
+        <li><strong>Discriminator ($D$):</strong> Tries to distinguish between real data and fake data from $G$.</li>
+    </ul>
+    <div class="math-block"><span class="math-display">\min_G \max_D V(D, G) = \mathbb{E}_{x}[\log D(x)] + \mathbb{E}_{z}[\log(1 - D(G(z)))]</span></div>
+    <p><strong>Mode Collapse:</strong> A common failure mode where $G$ produces limited varieties of outputs. Addressed by architectures like Wasserstein GANs and techniques like spectral normalization.</p>
+    <p><em>Notable Architectures:</em> DCGAN, StyleGAN, CycleGAN.</p>
+</div>
 
-            <div class="topic-card accent-amber" style="margin-top: 1.5rem;">
-                <h3><span class="card-icon">📝</span> Large Language Models (LLMs)</h3>
-                <p>Modern LLMs are scaled-up autoregressive Transformers trained on next-token prediction.</p>
-                <div class="code-block">
-                    <div class="code-block-header">Tokenization Example (Python)</div>
-                    <pre><code><span class="code-keyword">import</span> tiktoken
-<span class="code-comment"># LLMs process tokens (subwords), not raw characters</span>
-encoder = tiktoken.get_encoding(<span class="code-string">"cl100k_base"</span>)
-tokens = encoder.encode(<span class="code-string">"Analytics meets Deep Learning!"</span>)
-<span class="code-function">print</span>(tokens) <span class="code-comment"># Output: [37554, 4232, 11626, 21976, 0]</span></code></pre>
-                </div>
-                <p><strong>Scaling Laws:</strong> Model performance predictably improves as a power-law relationship with compute, dataset size, and parameter count.</p>
-            </div>
+<div class="topic-card accent-emerald">
+    <h3><span class="card-icon">🌫️</span> 4. Diffusion Models</h3>
+    <p>Diffusion models have largely superseded GANs for high-quality image generation (e.g., Stable Diffusion, DALL-E, Midjourney).</p>
+    <ul>
+        <li><strong>Forward Process:</strong> Gradually adds Gaussian noise to the data over $T$ steps until it is pure noise.</li>
+        <li><strong>Reverse Process:</strong> A neural network (often a U-Net) learns to sequentially denoise the data step-by-step.</li>
+    </ul>
+    <div class="highlight-box important">
+        <div class="highlight-title">Why they beat GANs</div>
+        <p>Diffusion models offer far more stable training and better mode coverage (diversity of generated samples) than GANs, though generation is typically slower due to the sequential denoising process.</p>
+    </div>
+</div>
 
-            <div class="topic-card accent-cyan" style="margin-top: 1.5rem;">
-                <h3><span class="card-icon">🎮</span> Interactive Demo: Generative Latent Space</h3>
-                <p>Click on the 2D latent space to generate a pattern based on those latent coordinates. Notice how nearby points create similar patterns!</p>
-                <div class="demo-container" style="position: relative; width: 100%; height: 450px; background: #080818; border-radius: 8px; overflow: hidden; margin-top: 1rem;">
-                    <canvas id="demo-canvas-9" width="900" height="450" style="display: block; width: 100%; height: 100%;"></canvas>
-                    <div id="demo-controls-9" style="position: absolute; bottom: 10px; left: 10px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
-                </div>
-            </div>
+<div class="topic-card accent-amber">
+    <h3><span class="card-icon">🦜</span> 5. Large Language Models (LLMs)</h3>
+    <p>Modern LLMs are predominantly based on the Transformer architecture, trained on massive datasets using autoregressive <strong>next-token prediction</strong>.</p>
+    <ul>
+        <li><strong>Tokenization:</strong> Text is chunked into subwords (tokens) using algorithms like Byte-Pair Encoding (BPE) or SentencePiece.</li>
+        <li><strong>Scaling Laws:</strong> Model performance improves predictably with increases in compute, dataset size, and parameter count.</li>
+        <li><strong>Emergent Abilities:</strong> At sufficient scale, LLMs demonstrate zero-shot and few-shot capabilities not explicitly trained for.</li>
+    </ul>
+    <p><strong>RLHF &amp; Alignment:</strong> Reinforcement Learning from Human Feedback is used to align model outputs with human preferences and safety guidelines.</p>
+</div>
 
-            <div class="key-takeaway">
-                <h4>Key Takeaways</h4>
-                <ul>
-                    <li>Generative AI has evolved from Autoencoders to VAEs, GANs, and Diffusion models for images.</li>
-                    <li>LLMs rely on the simple objective of predicting the next token, scaled to massive datasets.</li>
-                    <li>Latent space exploration allows for interpolation and semantic manipulation of generated outputs.</li>
-                </ul>
-            </div>
-        `,
+<div class="topic-card accent-blue">
+    <h3><span class="card-icon">🏗️</span> 6. Multimodal &amp; Foundation Models</h3>
+    <p>The current frontier involves models that can process and generate across multiple modalities (text, images, audio).</p>
+    <ul>
+        <li><strong>Multimodal Models:</strong> Examples include CLIP (contrastive text-image pairs), Flamingo, and GPT-4V.</li>
+        <li><strong>Foundation Models:</strong> The paradigm of pretraining a massive model on diverse data at scale, which can then be fine-tuned or prompted for a wide variety of downstream tasks.</li>
+    </ul>
+</div>
+
+<div class="topic-card">
+    <h3><span class="card-icon">🎮</span> 7. Interactive Demo: Generative Latent Space</h3>
+    <p>Click and drag in the 2D latent space on the left. The decoder neural network generates a procedural pattern on the right based on the chosen $z$ coordinates. Notice how the output smoothly interpolates as you move through the latent space.</p>
+    <p><em>(See the live demo below)</em></p>
+</div>
+
+<div class="key-takeaway">
+    <h4>Key Takeaways</h4>
+    <ul>
+        <li>Generative AI evolved from Autoencoders to VAEs, GANs, and Diffusion models.</li>
+        <li>LLMs rely on next-token prediction scaled to massive datasets.</li>
+        <li>Diffusion models offer better training stability than GANs.</li>
+        <li>Foundation models (pretrain + fine-tune) represent the new paradigm of AI development.</li>
+        <li>Latent space exploration enables interpolation and semantic manipulation.</li>
+    </ul>
+</div>
+`,
         initDemo: function(container) {
-            const canvas = document.getElementById('demo-canvas-9');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let animationId;
+
+var latentCanvas = null;
+var genCanvas = null;
+var latentCtx = null;
+var genCtx = null;
+var currentZ = { x: 0, y: 0 };
+var targetZ = { x: 0, y: 0 };
+var isDragging = false;
+var animationFrameId = null;
+var time = 0;
+
+function setupDemo(container) {
+    var demoHTML = '<div style="display: flex; gap: 20px; margin-top: 20px; align-items: flex-start; flex-wrap: wrap;">' +
+        '<div style="flex: 1; min-width: 250px; background: #1e293b; padding: 15px; border-radius: 8px;">' +
+            '<h4 style="margin-top:0; color:#e2e8f0; text-align:center;">Latent Space Z (2D)</h4>' +
+            '<canvas id="latentSpaceCanvas" width="250" height="250" style="background:#0f172a; border-radius:4px; cursor:crosshair; width:100%; max-width:250px; display:block; margin:0 auto;"></canvas>' +
+            '<p style="text-align:center; font-size:0.85em; color:#94a3b8; margin-bottom:0; margin-top:10px;">Click & drag to explore</p>' +
+        '</div>' +
+        '<div style="flex: 1; min-width: 250px; background: #1e293b; padding: 15px; border-radius: 8px;">' +
+            '<h4 style="margin-top:0; color:#e2e8f0; text-align:center;">Generated Output D(z)</h4>' +
+            '<canvas id="genOutputCanvas" width="250" height="250" style="background:#000; border-radius:4px; width:100%; max-width:250px; display:block; margin:0 auto;"></canvas>' +
+        '</div>' +
+    '</div>';
+
+    container.innerHTML = demoHTML;
+
+    latentCanvas = container.querySelector('#latentSpaceCanvas');
+    genCanvas = container.querySelector('#genOutputCanvas');
+    latentCtx = latentCanvas.getContext('2d');
+    genCtx = genCanvas.getContext('2d');
+
+    // Setup interactions
+    function updateZFromEvent(e) {
+        var rect = latentCanvas.getBoundingClientRect();
+        var scaleX = latentCanvas.width / rect.width;
+        var scaleY = latentCanvas.height / rect.height;
+        var x = (e.clientX - rect.left) * scaleX;
+        var y = (e.clientY - rect.top) * scaleY;
+        
+        // Map to -1 to 1
+        targetZ.x = (x / latentCanvas.width) * 2 - 1;
+        targetZ.y = (y / latentCanvas.height) * 2 - 1;
+        
+        // Clamp
+        targetZ.x = Math.max(-1, Math.min(1, targetZ.x));
+        targetZ.y = Math.max(-1, Math.min(1, targetZ.y));
+    }
+
+    latentCanvas.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        updateZFromEvent(e);
+    });
+
+    window.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            updateZFromEvent(e);
+        }
+    });
+    
+    latentCanvas.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 0) {
+            isDragging = true;
+            updateZFromEvent(e.touches[0]);
+            e.preventDefault();
+        }
+    }, {passive: false});
+    
+    window.addEventListener('touchend', function() {
+        isDragging = false;
+    });
+    
+    window.addEventListener('touchmove', function(e) {
+        if (isDragging && e.touches.length > 0) {
+            updateZFromEvent(e.touches[0]);
+        }
+    }, {passive: false});
+
+    // Start animation loop
+    animate();
+}
+
+function drawLatentSpace() {
+    if (!latentCtx) return;
+    var width = latentCanvas.width;
+    var height = latentCanvas.height;
+    
+    latentCtx.clearRect(0, 0, width, height);
+    
+    // Draw grid
+    latentCtx.strokeStyle = '#334155';
+    latentCtx.lineWidth = 1;
+    latentCtx.beginPath();
+    latentCtx.moveTo(width/2, 0);
+    latentCtx.lineTo(width/2, height);
+    latentCtx.moveTo(0, height/2);
+    latentCtx.lineTo(width, height/2);
+    latentCtx.stroke();
+    
+    // Draw concentric circles (prior distribution visual)
+    latentCtx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
+    for(var r = 0.2; r <= 1.0; r += 0.2) {
+        latentCtx.beginPath();
+        latentCtx.arc(width/2, height/2, (width/2) * r, 0, Math.PI * 2);
+        latentCtx.stroke();
+    }
+    
+    // Draw current Z point
+    var px = (currentZ.x + 1) / 2 * width;
+    var py = (currentZ.y + 1) / 2 * height;
+    
+    // Glow
+    var grad = latentCtx.createRadialGradient(px, py, 0, px, py, 15);
+    grad.addColorStop(0, 'rgba(236, 72, 153, 0.8)');
+    grad.addColorStop(1, 'rgba(236, 72, 153, 0)');
+    latentCtx.fillStyle = grad;
+    latentCtx.beginPath();
+    latentCtx.arc(px, py, 15, 0, Math.PI * 2);
+    latentCtx.fill();
+    
+    // Core dot
+    latentCtx.fillStyle = '#ec4899';
+    latentCtx.beginPath();
+    latentCtx.arc(px, py, 5, 0, Math.PI * 2);
+    latentCtx.fill();
+}
+
+function generateImage() {
+    if (!genCtx) return;
+    var width = genCanvas.width;
+    var height = genCanvas.height;
+    var imageData = genCtx.createImageData(width, height);
+    var data = imageData.data;
+    
+    time += 0.05;
+    
+    // "Decoder network" - procedural math based on Z
+    var z1 = currentZ.x * 5;
+    var z2 = currentZ.y * 5;
+    
+    for (var y = 0; y < height; y++) {
+        for (var x = 0; x < width; x++) {
+            // Map pixel coords to -1 to 1
+            var nx = (x / width) * 2 - 1;
+            var ny = (y / height) * 2 - 1;
             
-            let time = 0;
-            let targetZ = { x: 0, y: 0 };
-            let currentZ = { x: 0, y: 0 }; // For smooth interpolation
+            // Complex procedural math to simulate generated features
+            var d = Math.sqrt(nx*nx + ny*ny);
+            var a = Math.atan2(ny, nx);
             
-            // Draw UI space
-            const spaceW = 400;
-            const spaceH = 400;
-            const spaceX = 25;
-            const spaceY = 25;
-
-            // Handle clicks in latent space
-            const handleCanvasClick = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-
-                if (x >= spaceX && x <= spaceX + spaceW && y >= spaceY && y <= spaceY + spaceH) {
-                    // Map to [-1, 1]
-                    targetZ.x = ((x - spaceX) / spaceW) * 2 - 1;
-                    targetZ.y = ((y - spaceY) / spaceH) * 2 - 1;
-                }
-            };
-            canvas.addEventListener('click', handleCanvasClick);
-            this._cleanupClick = () => canvas.removeEventListener('click', handleCanvasClick);
-
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                time += 0.05;
-
-                // Interpolate
-                currentZ.x += (targetZ.x - currentZ.x) * 0.1;
-                currentZ.y += (targetZ.y - currentZ.y) * 0.1;
-
-                // 1. Draw Latent Space
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                ctx.fillRect(spaceX, spaceY, spaceW, spaceH);
-                ctx.strokeStyle = '#64748B';
-                ctx.strokeRect(spaceX, spaceY, spaceW, spaceH);
-                
-                // Axis
-                ctx.beginPath();
-                ctx.moveTo(spaceX + spaceW/2, spaceY);
-                ctx.lineTo(spaceX + spaceW/2, spaceY + spaceH);
-                ctx.moveTo(spaceX, spaceY + spaceH/2);
-                ctx.lineTo(spaceX + spaceW, spaceY + spaceH/2);
-                ctx.stroke();
-                
-                // Draw point
-                const px = spaceX + (currentZ.x + 1) * 0.5 * spaceW;
-                const py = spaceY + (currentZ.y + 1) * 0.5 * spaceH;
-                
-                ctx.beginPath();
-                ctx.arc(px, py, 8, 0, Math.PI * 2);
-                ctx.fillStyle = '#F472B6';
-                ctx.fill();
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#F472B6';
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-
-                // 2. Draw "Generated" Output (Procedural art based on Z)
-                const outX = 650;
-                const outY = 225;
-                const outR = 150;
-                
-                // Background of output
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.beginPath();
-                ctx.arc(outX, outY, outR, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Generate pattern
-                const numLines = 50 + Math.floor(currentZ.x * 20);
-                const freq = 3 + currentZ.y * 2;
-                
-                for(let i=0; i<numLines; i++) {
-                    const angle = (i / numLines) * Math.PI * 2;
-                    const radiusMod = outR * 0.8 * Math.abs(Math.sin(angle * freq + time));
-                    
-                    const p1x = outX + Math.cos(angle) * (outR * 0.2);
-                    const p1y = outY + Math.sin(angle) * (outR * 0.2);
-                    const p2x = outX + Math.cos(angle + currentZ.x) * radiusMod;
-                    const p2y = outY + Math.sin(angle + currentZ.y) * radiusMod;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(p1x, p1y);
-                    ctx.lineTo(p2x, p2y);
-                    
-                    // Color based on coords
-                    const r = Math.floor(128 + currentZ.x * 127);
-                    const g = Math.floor(128 + currentZ.y * 127);
-                    const b = 255;
-                    ctx.strokeStyle = \`rgba(\${r}, \${g}, \${b}, 0.5)\`;
-                    ctx.stroke();
-                }
-                
-                // Labels
-                ctx.fillStyle = '#E2E8F0';
-                ctx.font = '16px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Latent Space (Z)', spaceX + spaceW/2, spaceY - 10);
-                ctx.fillText('Generated Output (X)', outX, outY - outR - 20);
-                
-                ctx.font = '12px sans-serif';
-                ctx.fillStyle = '#A855F7';
-                ctx.fillText(\`z = [\${currentZ.x.toFixed(2)}, \${currentZ.y.toFixed(2)}]\`, px, py - 15);
-
-                animationId = requestAnimationFrame(draw);
-            }
+            var rVal = Math.sin(d * 10 - time + z1) * Math.cos(a * 4 + z2);
+            var gVal = Math.cos(d * 8 + time * 0.8 - z2) * Math.sin(a * 3 - z1);
+            var bVal = Math.sin(nx * 5 + z1) * Math.cos(ny * 5 + z2);
             
-            draw();
-            this._animationId = animationId;
+            // Add some "neural" noise/texture
+            var noise = (Math.sin(nx * 100) * Math.cos(ny * 100)) * 0.1;
+            
+            // Normalize to 0-255
+            var r = Math.floor((rVal + noise + 1) / 2 * 255);
+            var g = Math.floor((gVal + noise + 1) / 2 * 255);
+            var b = Math.floor((bVal + noise + 1) / 2 * 255);
+            
+            var index = (y * width + x) * 4;
+            data[index] = r;
+            data[index+1] = g;
+            data[index+2] = b;
+            data[index+3] = 255; // Alpha
+        }
+    }
+    
+    genCtx.putImageData(imageData, 0, 0);
+}
+
+function animate() {
+    // Interpolate towards target (smooth movement)
+    currentZ.x += (targetZ.x - currentZ.x) * 0.1;
+    currentZ.y += (targetZ.y - currentZ.y) * 0.1;
+    
+    drawLatentSpace();
+    generateImage();
+    
+    animationFrameId = requestAnimationFrame(animate);
+}
+
+setupDemo(container);
+
         },
         destroyDemo: function() {
-            if (this._animationId) cancelAnimationFrame(this._animationId);
-            if (this._cleanupClick) this._cleanupClick();
+            if (typeof animationFrameId !== 'undefined' && animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            if (typeof isDragging !== 'undefined') {
+                isDragging = false;
+            }
         }
     });
 })();
