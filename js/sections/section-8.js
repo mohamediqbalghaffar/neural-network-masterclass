@@ -120,106 +120,109 @@
     </ul>
 </div>`,
         initDemo: function(container) {
-        var words = ['The', 'cat', 'sat', 'on', 'the', 'mat'];
-        var attentionMatrix = [
-            [0.90, 0.05, 0.01, 0.01, 0.02, 0.01],
-            [0.05, 0.85, 0.05, 0.01, 0.02, 0.02],
-            [0.02, 0.10, 0.70, 0.08, 0.02, 0.08],
-            [0.01, 0.02, 0.05, 0.85, 0.02, 0.05],
-            [0.02, 0.02, 0.02, 0.02, 0.80, 0.12],
-            [0.01, 0.05, 0.15, 0.10, 0.09, 0.60]
-        ];
-        var selectedWordIndex = 2;
-        var animationId;
+            var words = ['The', 'cat', 'sat', 'on', 'the', 'mat'];
+            var attentionMatrix = [
+                [0.90, 0.05, 0.01, 0.01, 0.02, 0.01],
+                [0.05, 0.85, 0.05, 0.01, 0.02, 0.02],
+                [0.02, 0.10, 0.70, 0.08, 0.02, 0.08],
+                [0.01, 0.02, 0.05, 0.85, 0.02, 0.05],
+                [0.02, 0.02, 0.02, 0.02, 0.80, 0.12],
+                [0.01, 0.05, 0.15, 0.10, 0.09, 0.60]
+            ];
+            var selectedWordIndex = 2;
+            var animationId;
 
-        var canvas = document.createElement('canvas');
-        canvas.width = container.clientWidth || 800;
-        canvas.height = 400;
-        container.appendChild(canvas);
-        var ctx = canvas.getContext('2d');
+            var canvas = container.querySelector('canvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            var wordBoxWidth = 60;
-            var wordBoxHeight = 30;
-            var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
-            
-            ctx.font = '16px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            for (var i = 0; i < words.length; i++) {
-                var x = spacing + i * (wordBoxWidth + spacing);
-                var yTop = 50;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 
-                ctx.fillStyle = i === selectedWordIndex ? '#0ea5e9' : '#334155';
-                ctx.fillRect(x, yTop, wordBoxWidth, wordBoxHeight);
-                ctx.fillStyle = '#fff';
-                ctx.fillText(words[i], x + wordBoxWidth/2, yTop + wordBoxHeight/2);
+                var wordBoxWidth = 60;
+                var wordBoxHeight = 30;
+                var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
                 
-                var yBottom = canvas.height - 80;
-                ctx.fillStyle = '#334155';
-                ctx.fillRect(x, yBottom, wordBoxWidth, wordBoxHeight);
-                ctx.fillStyle = '#fff';
-                ctx.fillText(words[i], x + wordBoxWidth/2, yBottom + wordBoxHeight/2);
-            }
-            
-            var srcX = spacing + selectedWordIndex * (wordBoxWidth + spacing) + wordBoxWidth/2;
-            var srcY = 50 + wordBoxHeight;
-            
-            for (var j = 0; j < words.length; j++) {
-                var weight = attentionMatrix[selectedWordIndex][j];
-                var destX = spacing + j * (wordBoxWidth + spacing) + wordBoxWidth/2;
-                var destY = canvas.height - 80;
+                ctx.font = '16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 
-                ctx.beginPath();
-                ctx.moveTo(srcX, srcY);
-                ctx.bezierCurveTo(srcX, srcY + 100, destX, destY - 100, destX, destY);
-                
-                var alpha = weight;
-                ctx.strokeStyle = 'rgba(14, 165, 233, ' + alpha + ')';
-                ctx.lineWidth = Math.max(1, weight * 10);
-                ctx.stroke();
-            }
-            
-            ctx.fillStyle = '#64748b';
-            ctx.font = '14px sans-serif';
-            ctx.fillText('Click a word on the top row to see its attention weights to other words', canvas.width / 2, 20);
-            
-            animationId = requestAnimationFrame(draw);
-        }
-
-        draw();
-
-        canvas.addEventListener('click', function(e) {
-            var rect = canvas.getBoundingClientRect();
-            var mouseX = e.clientX - rect.left;
-            var mouseY = e.clientY - rect.top;
-            
-            var wordBoxWidth = 60;
-            var wordBoxHeight = 30;
-            var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
-            
-            for (var i = 0; i < words.length; i++) {
-                var x = spacing + i * (wordBoxWidth + spacing);
-                var yTop = 50;
-                
-                if (mouseX >= x && mouseX <= x + wordBoxWidth && mouseY >= yTop && mouseY <= yTop + wordBoxHeight) {
-                    selectedWordIndex = i;
-                    break;
+                for (var i = 0; i < words.length; i++) {
+                    var x = spacing + i * (wordBoxWidth + spacing);
+                    var yTop = 50;
+                    
+                    ctx.fillStyle = i === selectedWordIndex ? '#0ea5e9' : '#334155';
+                    ctx.fillRect(x, yTop, wordBoxWidth, wordBoxHeight);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(words[i], x + wordBoxWidth/2, yTop + wordBoxHeight/2);
+                    
+                    var yBottom = canvas.height - 80;
+                    ctx.fillStyle = '#334155';
+                    ctx.fillRect(x, yBottom, wordBoxWidth, wordBoxHeight);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(words[i], x + wordBoxWidth/2, yBottom + wordBoxHeight/2);
                 }
+                
+                var srcX = spacing + selectedWordIndex * (wordBoxWidth + spacing) + wordBoxWidth/2;
+                var srcY = 50 + wordBoxHeight;
+                
+                for (var j = 0; j < words.length; j++) {
+                    var weight = attentionMatrix[selectedWordIndex][j];
+                    var destX = spacing + j * (wordBoxWidth + spacing) + wordBoxWidth/2;
+                    var destY = canvas.height - 80;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(srcX, srcY);
+                    ctx.bezierCurveTo(srcX, srcY + 100, destX, destY - 100, destX, destY);
+                    
+                    var alpha = weight;
+                    ctx.strokeStyle = 'rgba(14, 165, 233, ' + alpha + ')';
+                    ctx.lineWidth = Math.max(1, weight * 10);
+                    ctx.stroke();
+                }
+                
+                ctx.fillStyle = '#64748b';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('Click a word on the top row to see its attention weights to other words', canvas.width / 2, 20);
+                
+                animationId = requestAnimationFrame(draw);
             }
-        });
 
-        container.demoContext = {
-            animationId: animationId
-        };
+            draw();
+
+            const clickHandler = function(e) {
+                var rect = canvas.getBoundingClientRect();
+                var mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+                var mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+                
+                var wordBoxWidth = 60;
+                var wordBoxHeight = 30;
+                var spacing = (canvas.width - words.length * wordBoxWidth) / (words.length + 1);
+                
+                for (var i = 0; i < words.length; i++) {
+                    var x = spacing + i * (wordBoxWidth + spacing);
+                    var yTop = 50;
+                    
+                    if (mouseX >= x && mouseX <= x + wordBoxWidth && mouseY >= yTop && mouseY <= yTop + wordBoxHeight) {
+                        selectedWordIndex = i;
+                        break;
+                    }
+                }
+            };
+            
+            canvas.addEventListener('click', clickHandler);
+
+            this._animationId = animationId;
+            this._clickHandler = clickHandler;
+            this._canvas = canvas;
         },
-        destroyDemo: function(container) {
-        if (container.demoContext && container.demoContext.animationId) {
-            cancelAnimationFrame(container.demoContext.animationId);
-        }
+        destroyDemo: function() {
+            if (this._animationId) {
+                cancelAnimationFrame(this._animationId);
+            }
+            if (this._canvas && this._clickHandler) {
+                this._canvas.removeEventListener('click', this._clickHandler);
+            }
         }
     });
 })();
