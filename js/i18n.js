@@ -69,7 +69,10 @@ const I18n = (function() {
         
         // Re-render NeuralApp if initialized
         if (window.NeuralApp && window.NeuralApp.reRender) {
-            window.NeuralApp.reRender();
+            NeuralApp.reRender();
+        }
+        if (window.NeuralApp && window.NeuralApp.closeSidebar) {
+            NeuralApp.closeSidebar();
         }
     }
 

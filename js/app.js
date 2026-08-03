@@ -198,8 +198,8 @@ const NeuralApp = (function () {
             window.location.hash = sectionId === 'welcome' ? '#section-welcome' : `#section-${sectionId}`;
         }
 
-        // Scroll to top of main
-        document.getElementById('mainContent').scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to top of window
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
         // Close mobile sidebar
         closeSidebar();
@@ -531,6 +531,7 @@ const NeuralApp = (function () {
         navigateTo,
         sections,
         sectionMeta,
+        closeSidebar,
     };
 })();
 
