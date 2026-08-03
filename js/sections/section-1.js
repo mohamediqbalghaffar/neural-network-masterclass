@@ -66,7 +66,7 @@
             <div class="topic-card">
                 <h3>Interactive Demo: Fitting Non-Linearity</h3>
                 <p>Watch how adding hidden neurons allows a neural network to fit a complex curve, while a linear model can only draw a straight line.</p>
-                <canvas id="demo-canvas-1" width="900" height="450" style="background: #080818; border-radius: 8px;"></canvas>
+                <p><em>(See the live demo below)</em></p>
             </div>
             
             <div class="key-takeaway">
