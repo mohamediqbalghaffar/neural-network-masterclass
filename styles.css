@@ -1621,29 +1621,19 @@ button,
 .preview-card,
 .collapsible-trigger,
 .tab-btn {
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
+    /* Removed user-select and touch-action to prevent iOS Safari click suppression bugs */
 }
 
-/* Instant tactile feedback on tap */
+/* Instant tactile feedback on tap (without moving the element to prevent click cancellation) */
 .nav-item:active,
 .demo-btn:active,
 .section-nav-btn:active,
 .cta-button:active,
 .lang-toggle:active,
-.tab-btn:active {
-    transform: scale(0.95) !important;
-    transition: transform 0.1s !important;
-}
-
+.tab-btn:active,
 .sidebar-toggle:active,
-.collapsible-trigger:active {
-    transform: scale(0.9) !important;
-    transition: transform 0.1s !important;
-}
-
+.collapsible-trigger:active,
 .preview-card:active {
-    transform: scale(0.98) !important;
-    transition: transform 0.1s !important;
+    opacity: 0.7 !important;
+    transition: opacity 0.1s !important;
 }
